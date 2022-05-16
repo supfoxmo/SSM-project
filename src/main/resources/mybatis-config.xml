@@ -1,14 +1,15 @@
-<?xml version="1.0" encoding="UTF8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE configuration
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
-
 <configuration>
-    <!--起别名-->
+    <settings>
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>
     <typeAliases>
-        <package name="com.foxmo.crm.pojo"/>
+        <package name="com.foxmo.crm.model"/>
     </typeAliases>
-
-    <!--绑定接口-->
-
+    <mappers>
+        <package name="com.foxmo.crm.mapper"/>
+    </mappers>
 </configuration>
