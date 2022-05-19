@@ -16,6 +16,7 @@
 		$(window).keydown(function (e) {
 			//如果按的是回车键，则提交登录请求
 			if(e.keyCode==13){
+				//单击登录按钮
 				$("#loginBtn").click();
 			}
 		});

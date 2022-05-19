@@ -22,4 +22,5 @@ http://www.springframework.org/schema/aop/spring-aop.xsd">
     <context:component-scan base-package="com.foxmo.crm.workbench.service" />
     <!-- 导入数据相关配置 -->
     <import resource="applicationContext-datasource.xml" />
+    <import resource="applicationContext-mvc.xml"></import>
 </beans>
