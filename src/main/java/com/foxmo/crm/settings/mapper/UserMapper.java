@@ -2,6 +2,7 @@ package com.foxmo.crm.settings.mapper;
 
 import com.foxmo.crm.settings.domain.User;
 
+import java.util.List;
 import java.util.Map;
 
 public interface UserMapper {
@@ -59,4 +60,10 @@ public interface UserMapper {
      * @return
      */
     User selectUserByLoginActAndPwd(Map<String,Object> map);
+
+    /**
+     * 查询所有用户信息
+     * @return
+     */
+    List<User> selectAllUser();
 }

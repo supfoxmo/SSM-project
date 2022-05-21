@@ -33,7 +33,16 @@ public class UserController {
         return "settings/qx/user/login";
     }
 
-
+    /**
+     * 用户登录
+     * @param loginAct
+     * @param loginPwd
+     * @param isRemPwd
+     * @param request
+     * @param response
+     * @param session
+     * @return
+     */
     @RequestMapping("/settings/qx/user/login.do")
     public @ResponseBody Object login(String loginAct, String loginPwd, String isRemPwd, HttpServletRequest request, HttpServletResponse response, HttpSession session){
         //封装参数
@@ -60,8 +69,8 @@ public class UserController {
                 //登录失败，账号状态已锁定
                 retObject.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
                 retObject.setMessage("账号状态已锁定");
-            }else if (!user.getAllowIps().contains(request.getRemoteAddr())){
-                System.out.println(request.getRemoteAddr());
+            }else if (!(user.getAllowIps().contains(request.getRemoteAddr()) || user.getAllowIps().contains("0.0.0.0"))){
+                //若后台数据 allow_ips 中包含0.0.0.0,则表示可以在任意IP下登录
                 //登录失败，用户没有在指定IP下登录，IP受限
                 retObject.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
                 retObject.setMessage("IP受限");
@@ -97,10 +106,31 @@ public class UserController {
                     //将cookie返回前端页面
                     response.addCookie(cookie2);
                 }
-
             }
         }
         return retObject;
     }
+
+    /**
+     * 安全退出功能
+     * @param response
+     * @param session
+     * @return
+     */
+    @RequestMapping("/settings/qx/user/logout.do")
+    public String logout(HttpServletResponse response,HttpSession session){
+        //删除Cookie中的数据
+        Cookie cookie1 = new Cookie("loginAct", "0");
+        cookie1.setMaxAge(0);
+        response.addCookie(cookie1);
+        Cookie cookie2 = new Cookie("loginPwd", "0");
+        cookie2.setMaxAge(0);
+        response.addCookie(cookie2);
+        //销毁Session中数据
+        session.invalidate();
+        //重定向到登录页面
+        return "redirect:/settings/qx/user/toLogin.do";
+    }
+
 
 }
