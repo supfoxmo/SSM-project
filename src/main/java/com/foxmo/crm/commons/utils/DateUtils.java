@@ -11,7 +11,7 @@ public class DateUtils {
      */
     public static String formatDateTima(Date date){
         //定义时间字符串格式
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM--dd HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return dateFormat.format(date);
     }
 }

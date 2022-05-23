@@ -507,7 +507,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						</div>
 
 						<div class="form-group">
-							<label for="edit-startTime" class="col-sm-2 control-label">开始日期</label>
+							<label for="edit-startTime" class="col-sm-2 control-label">日期</label>
 							<div class="col-sm-10" style="width: 300px;">
 								<input type="text" class="form-control" id="edit-startTime" value="2020-10-10">
 							</div>
@@ -612,13 +612,13 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">开始日期</div>
-					  <input class="form-control" type="text" id="query-startDate" />
+					  <input class="form-control mydate" type="text" id="query-startDate" />
 				    </div>
 				  </div>
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">结束日期</div>
-					  <input class="form-control" type="text" id="query-endDate">
+					  <input class="form-control mydate" type="text" id="query-endDate">
 				    </div>
 				  </div>
 				  
@@ -650,26 +650,26 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						</tr>
 					</thead>
 					<tbody id="tBody">
-						<%--<tr class="active">
-							<td><input type="checkbox" /></td>
-							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detdetail.jsp>发传单</a></td>
-                            <td>zhangsan</td>
-							<td>2020-10-10</td>
-							<td>2020-10-20</td>
-						</tr>
-                        <tr class="active">
-                            <td><input type="checkbox" /></td>
-                            <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detdetail.jsp>发传单</a></td>
-                            <td>zhangsan</td>
-                            <td>2020-10-10</td>
-                            <td>2020-10-20</td>
-                        </tr>--%>
+<%--						<tr class="active">--%>
+<%--							<td><input type="checkbox" /></td>--%>
+<%--							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detdetail.jsp>${acti}</a></td>--%>
+<%--                            <td>zhangsan</td>--%>
+<%--							<td>2020-10-10</td>--%>
+<%--							<td>2020-10-20</td>--%>
+<%--						</tr>--%>
+<%--                        <tr class="active">--%>
+<%--                            <td><input type="checkbox" /></td>--%>
+<%--                            <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detdetail.jsp>发传单</a></td>--%>
+<%--                            <td>zhangsan</td>--%>
+<%--                            <td>2020-10-10</td>--%>
+<%--                            <td>2020-10-20</td>--%>
+<%--                        </tr>--%>
 					</tbody>
 				</table>
-				<div id="demo_pag1"></div>
+<%--				<div id="demo_pag1"></div>--%>
 			</div>
 
-			<%--<div style="height: 50px; position: relative;top: 30px;">
+			<div style="height: 50px; position: relative;top: 30px;">
 				<div>
 					<button type="button" class="btn btn-default" style="cursor: default;">共<b id="totalRowsB">50</b>条记录</button>
 				</div>
@@ -702,7 +702,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						</ul>
 					</nav>
 				</div>
-			</div>--%>
+			</div>
 			
 		</div>
 		
