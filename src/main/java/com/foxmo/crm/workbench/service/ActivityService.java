@@ -13,4 +13,6 @@ public interface ActivityService {
     List<Activity> queryActivityByConditionForPage(Map<String,Object> map);
     //根据条件查询指定市场活动的总条数
     int queryConutOfActivityByCondition(Map<String,Object> map);
+
+    int removeActivityByIds(String[] ids);
 }

@@ -83,4 +83,25 @@ public class ActivityController {
 
         return retMap;
     }
+
+    @ResponseBody
+    @RequestMapping("/workbench/activity/removeActivityByIds.do")
+    public Object removeActivityByIds(String[] ids){
+        ReturnObject retObj = new ReturnObject();
+        try{
+            int i = activityService.removeActivityByIds(ids);
+            if (i > 0){
+                retObj.setCode(Constant.RETURN_OBJECT_CODE_SUCCESS);
+                retObj.setMessage("删除成功");
+            }else{
+                retObj.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
+                retObj.setMessage("删除失败，请稍后再试");
+            }
+        }catch(Exception e){
+            retObj.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
+            retObj.setMessage("删除失败，请稍后再试");
+            e.printStackTrace();
+        }
+        return retObj;
+    }
 }
