@@ -252,4 +252,22 @@
     </foreach>
   </delete>
 
+  <select id="selectActivityById" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_activity
+    where id = #{id}
+  </select>
+
+  <insert id="SaveEditActivityById" parameterType="activity" >
+    update tbl_activity
+    set owner=#{owner},
+        name=#{name},
+        start_date=#{startDate},
+        end_date=#{endDate},
+        cost=#{cost},
+        description=#{description},
+        edit_time=#{editTime},
+        edit_by=#{editBy}
+    where id=#{id}
+  </insert>
 </mapper>

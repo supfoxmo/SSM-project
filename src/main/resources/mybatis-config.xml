@@ -12,5 +12,7 @@
     </typeAliases>
     <mappers>
         <package name="com.foxmo.crm.mapper"/>
+        <package name="com.foxmo.crm.settings.mapper"/>
+        <package name="com.foxmo.crm.workbench.mapper"/>
     </mappers>
 </configuration>

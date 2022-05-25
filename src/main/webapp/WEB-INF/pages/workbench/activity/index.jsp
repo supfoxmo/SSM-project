@@ -249,7 +249,27 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			var cost=$.trim($("#edit-cost").val());
 			var description=$.trim($("#edit-description").val());
 			//表单验证(作业)
-
+			if(owner==""){
+				alert("所有者不能为空");
+				return;
+			}
+			if(name==""){
+				alert("名称不能为空");
+				return;
+			}
+			if(startDate!=""&&endDate!=""){
+				//使用字符串的大小代替日期的大小
+				if(endDate<startDate){
+					alert("结束日期不能比开始日期小");
+					return;
+				}
+			}
+			
+			var regExp=/^(([1-9]\d*)|0)$/;
+			if(!regExp.test(cost)){
+				alert("成本只能为非负整数");
+				return;
+			}
 			//发送请求
 			$.ajax({
 				url:'workbench/activity/saveEditActivity.do',
@@ -507,13 +527,13 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						</div>
 
 						<div class="form-group">
-							<label for="edit-startTime" class="col-sm-2 control-label">日期</label>
+							<label for="edit-startTime" class="col-sm-2 control-label">开始日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-startTime" value="2020-10-10">
+								<input type="text" class="form-control mydate" id="edit-startTime" value="2020-10-10" readonly>
 							</div>
 							<label for="edit-endTime" class="col-sm-2 control-label">结束日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-endTime" value="2020-10-20">
+								<input type="text" class="form-control mydate" id="edit-endTime" value="2020-10-20" readonly>
 							</div>
 						</div>
 						

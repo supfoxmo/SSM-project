@@ -8,6 +8,7 @@ import com.foxmo.crm.settings.domain.User;
 import com.foxmo.crm.settings.service.UserService;
 import com.foxmo.crm.workbench.domain.Activity;
 import com.foxmo.crm.workbench.service.ActivityService;
+import jdk.nashorn.internal.runtime.ECMAException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -86,10 +87,10 @@ public class ActivityController {
 
     @ResponseBody
     @RequestMapping("/workbench/activity/removeActivityByIds.do")
-    public Object removeActivityByIds(String[] ids){
+    public Object removeActivityByIds(String[] id){
         ReturnObject retObj = new ReturnObject();
         try{
-            int i = activityService.removeActivityByIds(ids);
+            int i = activityService.removeActivityByIds(id);
             if (i > 0){
                 retObj.setCode(Constant.RETURN_OBJECT_CODE_SUCCESS);
                 retObj.setMessage("删除成功");
@@ -103,5 +104,39 @@ public class ActivityController {
             e.printStackTrace();
         }
         return retObj;
+    }
+
+    @ResponseBody
+    @RequestMapping("/workbench/activity/queryActivityById.do")
+    public Object queryActivityById(String id){
+        return activityService.queryAvtivityById(id);
+    }
+
+    @ResponseBody
+    @RequestMapping("/workbench/activity/saveEditActivity.do")
+    public Object saveEditActivity(Activity activity,HttpSession session){
+        //进一步封装数据
+        activity.setEditTime(DateUtils.formatDateTima(new Date()));
+        //获取当前登录用户
+        User user = (User) session.getAttribute(Constant.SESSION_USER);
+        activity.setEditBy(user.getId());
+
+        //创建响应信息封装对象
+        ReturnObject returnObject = new ReturnObject();
+        try{
+            int i = activityService.saveEditActivityById(activity);
+            if (i > 0){
+                returnObject.setCode(Constant.RETURN_OBJECT_CODE_SUCCESS);
+                returnObject.setMessage("修改成功");
+            }else{
+                returnObject.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
+                returnObject.setMessage("修改失败");
+            }
+        }catch(Exception e){
+            returnObject.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
+            returnObject.setMessage("修改失败");
+            e.printStackTrace();
+        }
+        return returnObject;
     }
 }
