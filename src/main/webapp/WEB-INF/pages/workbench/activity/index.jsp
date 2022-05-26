@@ -264,7 +264,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 					return;
 				}
 			}
-			
+
 			var regExp=/^(([1-9]\d*)|0)$/;
 			if(!regExp.test(cost)){
 				alert("成本只能为非负整数");
@@ -303,7 +303,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		//给"批量导出"按钮添加单击事件
 		$("#exportActivityAllBtn").click(function () {
 			//发送同步请求
-			window.location.href="workbench/activity/exportAllActivitys.do";
+			window.location.href="workbench/activity/queryAllActivitys.do";
 		});
 
 		//给"导入"按钮添加单击事件
