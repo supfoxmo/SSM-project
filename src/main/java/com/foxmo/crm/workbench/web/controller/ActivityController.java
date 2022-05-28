@@ -20,8 +20,10 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.ws.Response;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 @Controller
@@ -236,12 +238,12 @@ public class ActivityController {
             }
         }
         //生成excel文件
-        FileOutputStream fos = new FileOutputStream("D:\\文档文件\\Excel\\studentList.xls");
-        workbook.write(fos);
+//        FileOutputStream fos = new FileOutputStream("D:\\文档文件\\Excel\\studentList.xls");
+//        workbook.write(fos);
 
         //关闭资源
-        fos.close();
-        workbook.close();
+//        fos.close();
+//        workbook.close();
 
         //将生成的excel文件下载到客户端
         //设置响应类型
@@ -249,19 +251,125 @@ public class ActivityController {
         response.addHeader("Content-Disposition","attachment;filename=activityList.xls");
         //获取输出流
         ServletOutputStream outputStream = response.getOutputStream();
+        //直接将excel文件写入到输出流上
+        workbook.write(outputStream);
         //创建文件输入流，读取excel文件
-        FileInputStream fis = new FileInputStream("D:\\文档文件\\Excel\\studentList.xls");
+//        FileInputStream fis = new FileInputStream("D:\\文档文件\\Excel\\studentList.xls");
 
-        byte[] buff = new byte[256];
-        int len = 0;
-
-        while((len = fis.read(buff)) != -1){
-            //输出数据到客户端
-            outputStream.write(buff,0,len);
-        }
+//        byte[] buff = new byte[256];
+//        int len = 0;
+//
+//        while((len = fis.read(buff)) != -1){
+//            //输出数据到客户端
+//            outputStream.write(buff,0,len);
+//        }
 
         //关闭资源
-        fis.close();
+        workbook.close();
+        outputStream.flush();
+    }
+
+    //选择导出
+    @RequestMapping("/workbench/activity/queryActivityByIds.do")
+    public void queryActivityByIds(String[] id, HttpServletResponse response) throws IOException {
+        //调用service层的方法，查询指定的市场活动的信息
+        List<Activity> activityList = activityService.queryActivityByIds(id);
+        //创建HSSFWorkbook对象，对应一个excel文件
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        //使用workbook创建HSSFSheet对象，对应workbook文件中的一页
+        HSSFSheet sheet = workbook.createSheet("学生列表");
+        //使用sheet创建row对象，对应sheet一页中的一行
+        HSSFRow row = sheet.createRow(0);
+        //生成HSSFCellStyle对象（样式）
+        HSSFCellStyle style = workbook.createCellStyle();
+        //使用row创建cell对象，对应行中的列
+        HSSFCell cell = row.createCell(0);
+        cell.setCellValue("ID");
+        cell.setCellStyle(style);
+        cell = row.createCell(1);
+        cell.setCellValue("所有者");
+        cell.setCellStyle(style);
+        cell = row.createCell(2);
+        cell.setCellValue("活动名称");
+        cell.setCellStyle(style);
+        cell = row.createCell(3);
+        cell.setCellValue("开始时间");
+        cell.setCellStyle(style);
+        cell = row.createCell(4);
+        cell.setCellValue("结束时间");
+        cell.setCellStyle(style);
+        cell = row.createCell(5);
+        cell.setCellValue("活动成本");
+        cell.setCellStyle(style);
+        cell = row.createCell(6);
+        cell.setCellValue("活动描述");
+        cell.setCellStyle(style);
+        cell = row.createCell(7);
+        cell.setCellValue("创建时间");
+        cell.setCellStyle(style);
+        cell = row.createCell(8);
+        cell.setCellValue("创建者");
+        cell.setCellStyle(style);
+        cell = row.createCell(9);
+        cell.setCellValue("修改时间");
+        cell.setCellStyle(style);
+        cell = row.createCell(10);
+        cell.setCellValue("修改者");
+        cell.setCellStyle(style);
+
+        if (activityList != null && activityList.size() > 0){
+            Activity activity = null;
+            for (int i = 1; i <= activityList.size(); i++) {
+                activity = activityList.get(i - 1);
+                row = sheet.createRow(i);
+                cell = row.createCell(0);
+                cell.setCellValue(activity.getId());
+                cell.setCellStyle(style);
+                cell = row.createCell(1);
+                cell.setCellValue(activity.getOwner());
+                cell.setCellStyle(style);
+                cell = row.createCell(2);
+                cell.setCellValue(activity.getName());
+                cell.setCellStyle(style);
+                cell = row.createCell(3);
+                cell.setCellValue(activity.getStartDate());
+                cell.setCellStyle(style);
+                cell = row.createCell(4);
+                cell.setCellValue(activity.getEndDate());
+                cell.setCellStyle(style);
+                cell = row.createCell(5);
+                cell.setCellValue(activity.getCost());
+                cell.setCellStyle(style);
+                cell = row.createCell(6);
+                cell.setCellValue(activity.getDescription());
+                cell.setCellStyle(style);
+                cell = row.createCell(7);
+                cell.setCellValue(activity.getCreateTime());
+                cell.setCellStyle(style);
+                cell = row.createCell(8);
+                cell.setCellValue(activity.getCreateBy());
+                cell.setCellStyle(style);
+                cell = row.createCell(9);
+                cell.setCellValue(activity.getEditTime());
+                cell.setCellStyle(style);
+                cell = row.createCell(10);
+                cell.setCellValue(activity.getEditBy());
+                cell.setCellStyle(style);
+            }
+        }
+
+        //将生成的excel文件下载到客户端
+        //设置响应类型
+        response.setContentType("application/octet-stream;charset=UTF-8");
+        response.addHeader("Content-Disposition","attachment;filename=activityList.xls");
+
+        //获取输出流对象
+        ServletOutputStream outputStream = response.getOutputStream();
+        //直接将生成的excel文件写入到输出流中
+        workbook.write(outputStream);
+
+        //关闭资源
+        workbook.close();
         outputStream.flush();
     }
 }

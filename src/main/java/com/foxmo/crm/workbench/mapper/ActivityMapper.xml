@@ -246,7 +246,8 @@
   </select>
 
   <delete id="deleteActivityByIds" parameterType="string">
-    delete from tbl_activity where id in
+    delete from tbl_activity
+    where id in
     <foreach collection="array" item="id" open="(" separator="," close=")" >
         #{id}
     </foreach>
@@ -278,10 +279,18 @@
            join tbl_user u2 on a.create_by=u2.id
            left join tbl_user u3 on a.edit_by=u3.id
     order by a.create_time desc
-    --     select a.id,u1.name,a.name,a.start_date,a.end_date,a.cost,a.description,a.create_time,u2.name,a.edit_time,u3.name
-    --     from tbl_activity a
-    --     join tbl_user u1 on a.id = u1.id
-    --     join tbl_user u2 on a.create_by = u2.id
---          left join tbl_user u3 on a.edit_by = u3.id
+  </select>
+
+  <select id="selectActivityByIds" parameterType="string" resultMap="BaseResultMap">
+    select a.id,u1.name as owner,a.name,a.start_date,a.end_date,a.cost,a.description,a.create_time,u2.name as create_by,a.edit_time,u3.name as edit_by
+    from tbl_activity a
+    join tbl_user u1 on a.owner=u1.id
+    join tbl_user u2 on a.create_by=u2.id
+    left join tbl_user u3 on a.edit_by=u3.id
+    where id in
+    <foreach collection="array" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+    order by create_time desc
   </select>
 </mapper>

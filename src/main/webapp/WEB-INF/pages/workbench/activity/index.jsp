@@ -306,6 +306,27 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			window.location.href="workbench/activity/queryAllActivitys.do";
 		});
 
+		//给“选择导出”按钮添加单击事件
+		$("#exportActivityXzBtn").click(function () {
+			//收集参数
+			//获取列表中所有被选中的checkbox
+			var chekkedIds=$("#tBody input[type='checkbox']:checked");
+			if(chekkedIds.size() == 0){
+				alert("请选择要导出市场活动");
+				return;
+			}
+
+			//收集数据
+			var ids = "";
+			$.each(chekkedIds,function () {
+				ids += "id=" + this.value + "&";//id=xxxx&id=xxx&.....&id=xxx&
+			});
+			//取出最后的&符号
+			ids=ids.substr(0,ids.length-1);//id=xxxx&id=xxx&.....&id=xxx
+			//发送同步请求
+			window.location.href = "workbench/activity/queryActivityByIds.do?" + ids;
+		});
+
 		//给"导入"按钮添加单击事件
 		$("#importActivityBtn").click(function () {
 			//收集参数
@@ -352,6 +373,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				}
 			});
 		});
+
 	});
 
 	function queryActivityByConditionForPage(pageNo,pageSize) {

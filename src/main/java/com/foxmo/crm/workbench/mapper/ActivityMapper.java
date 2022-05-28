@@ -67,7 +67,7 @@ public interface ActivityMapper {
     int selectCountOfActivityByCondition(Map<String,Object> map);
 
     /**
-     * 根据ids删除市场活动信息
+     * 根据ids数组删除市场活动信息
      * @param ids
      * @return
      */
@@ -92,4 +92,11 @@ public interface ActivityMapper {
      * @return
      */
     List<Activity> selectAllActivity();
+
+    /**
+     * 根据ids数组查询指定的市场活动信息
+     * @param ids
+     * @return
+     */
+    List<Activity> selectActivityByIds(String[] id);
 }
