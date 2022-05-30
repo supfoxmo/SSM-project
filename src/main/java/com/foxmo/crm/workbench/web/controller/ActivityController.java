@@ -3,6 +3,7 @@ package com.foxmo.crm.workbench.web.controller;
 import com.foxmo.crm.commons.constant.Constant;
 import com.foxmo.crm.commons.domain.ReturnObject;
 import com.foxmo.crm.commons.utils.DateUtils;
+import com.foxmo.crm.commons.utils.HSSFUtils;
 import com.foxmo.crm.commons.utils.UUIDUtils;
 import com.foxmo.crm.settings.domain.User;
 import com.foxmo.crm.settings.service.UserService;
@@ -15,12 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.ws.Response;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -148,6 +151,7 @@ public class ActivityController {
         return returnObject;
     }
 
+    //导出所有市场活动信息
     @RequestMapping("/workbench/activity/queryAllActivitys.do")
     public void queryAllActivitys(HttpServletResponse response) throws Exception{
         //调用service层的方法，查询所有市场活动的信息
@@ -371,5 +375,85 @@ public class ActivityController {
         //关闭资源
         workbook.close();
         outputStream.flush();
+    }
+
+    @ResponseBody
+    @RequestMapping("/workbench/activity/importActivity.do")
+    public Object importActivity(MultipartFile activityFile,HttpSession session) {
+        //创建集合对象，存储所有市场活动
+        List<Activity> activityList = new ArrayList<>();
+        //创建返回信息封装类
+        ReturnObject retObject = null;
+        FileInputStream fis = null;
+        HSSFWorkbook workbook = null;
+        try {
+            //获取当前登录用户
+            User user = (User) session.getAttribute(Constant.SESSION_USER);
+            //获取导入的文件名包括后缀
+            String originalFilename = activityFile.getOriginalFilename();
+            //把excel文件在服务器指定的目录中生成一份相同的文件
+            File file = new File("D:\\文档文件\\Excel\\" + originalFilename);//路径必须手动创建好，文件如果不存在，系统会自动生成
+            activityFile.transferTo(file);
+            //根据excel文件生成HSSFWorkbench对象，该类封装了excel文件的所有信息
+            fis = new FileInputStream("D:\\文档文件\\Excel\\" + originalFilename);
+            workbook = new HSSFWorkbook(fis);
+            //根据workbench获取sheet对象，封装一页的所有数据
+            HSSFSheet sheet = workbook.getSheetAt(0);
+            //根据sheet获取row对象，封装一行的数据
+            HSSFRow row = null;
+            HSSFCell cell = null;
+            Activity activity = null;
+            //遍历sheet，封装数据
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {//sheet.getLastRowNum():最后一行的下标（总行数 - 1）
+                row = sheet.getRow(i);
+                activity = new Activity();
+                activity.setId(UUIDUtils.getUUID());
+                activity.setOwner(user.getId());
+                activity.setCreateBy(user.getId());
+                activity.setCreateTime(DateUtils.formatDateTima(new Date()));
+
+                for (int j = 0; j < row.getLastCellNum(); j++) {//row.getLastCellNum():最后一列的下标加一（总列数）
+                    cell = row.getCell(i);
+                    String cellValue = HSSFUtils.getCellValueForStr(cell);
+                    if (j == 0){
+                        activity.setName(cellValue);
+                    }else if (j == 1){
+                        activity.setStartDate(cellValue);
+                    }else if (j == 2){
+                        activity.setEndDate(cellValue);
+                    }else if (j == 3){
+                        activity.setCost(cellValue);
+                    }else{
+                        activity.setDescription(cellValue);
+                    }
+                }
+                //将activity对象存储到集合中
+                activityList.add(activity);
+            }
+            int count = activityService.saveActivityByList(activityList);
+
+            retObject = new ReturnObject();
+
+            retObject.setCode(Constant.RETURN_OBJECT_CODE_SUCCESS);
+            retObject.setRetDate(count);
+        } catch (IOException e) {
+            retObject.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
+            retObject.setMessage("导入市场活动失败");
+            e.printStackTrace();
+        }finally {
+            //关闭资源
+            try {
+                workbook.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                fis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return retObject;
     }
 }

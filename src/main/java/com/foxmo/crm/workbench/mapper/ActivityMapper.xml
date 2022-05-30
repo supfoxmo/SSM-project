@@ -259,7 +259,7 @@
     where id = #{id}
   </select>
 
-  <insert id="SaveEditActivityById" parameterType="activity" >
+  <update id="SaveEditActivityById" parameterType="activity" >
     update tbl_activity
     set owner=#{owner},
         name=#{name},
@@ -270,7 +270,7 @@
         edit_time=#{editTime},
         edit_by=#{editBy}
     where id=#{id}
-  </insert>
+  </update>
 
   <select id="selectAllActivity" resultMap="BaseResultMap">
     select a.id,u1.name as owner,a.name,a.start_date,a.end_date,a.cost,a.description,a.create_time,u2.name as create_by,a.edit_time,u3.name as edit_by
@@ -287,10 +287,19 @@
     join tbl_user u1 on a.owner=u1.id
     join tbl_user u2 on a.create_by=u2.id
     left join tbl_user u3 on a.edit_by=u3.id
-    where id in
-    <foreach collection="array" open="(" separator="," close=")">
+    where a.id in
+    <foreach collection="array" item="id" open="(" separator="," close=")" >
       #{id}
     </foreach>
     order by create_time desc
   </select>
+
+  <insert id="insertActivitysByList" parameterType="com.foxmo.crm.workbench.domain.Activity">
+    insert into tbl_activity
+    (id,owner,name,start_date,end_date,cost,description,create_time,create_by)
+    values
+    <foreach collection="list" item="activity" separator=",">
+      (#{activity.id},#{activity.owner},#{activity.name},#{activity.startDate},#{activity.endDate},#{activity.cost},#{activity.description},#{activity.createTime},#{activity.createBy})
+    </foreach>
+  </insert>
 </mapper>

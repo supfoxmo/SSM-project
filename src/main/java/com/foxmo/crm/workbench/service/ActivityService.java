@@ -22,5 +22,7 @@ public interface ActivityService {
     //查询所有市场活动信息
     List<Activity> queryAllActivity();
     //根据ids数组查询指定市场活动的信息
-    List<Activity> queryActivityByIds(String[] id);
+    List<Activity> queryActivityByIds(String[] ids);
+    //根据activityList集合新增市场活动
+    int saveActivityByList(List<Activity> activityList);
 }

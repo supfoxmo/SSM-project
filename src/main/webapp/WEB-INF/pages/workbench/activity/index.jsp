@@ -346,7 +346,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			//FormData最大的优势是不但能提交文本数据，还能提交二进制数据
 			var formData=new FormData();
 			formData.append("activityFile",activityFile);
-			formData.append("userName","张三");
+			// formData.append("userName","张三");
 
 			//发送请求
 			$.ajax({

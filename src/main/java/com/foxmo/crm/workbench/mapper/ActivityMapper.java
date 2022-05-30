@@ -98,5 +98,12 @@ public interface ActivityMapper {
      * @param ids
      * @return
      */
-    List<Activity> selectActivityByIds(String[] id);
+    List<Activity> selectActivityByIds(String[] ids);
+
+    /**
+     * 根据activityList集合新增市场活动
+     * @param activityList
+     * @return
+     */
+    int insertActivitysByList(List<Activity> activityList);
 }
