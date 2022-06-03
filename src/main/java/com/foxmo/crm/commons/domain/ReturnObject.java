@@ -3,15 +3,15 @@ package com.foxmo.crm.commons.domain;
 public class ReturnObject {
     private String code;
     private String message;
-    private Object retDate;
+    private Object retData;
 
     public ReturnObject() {
     }
 
-    public ReturnObject(String code, String message, Object retDate) {
+    public ReturnObject(String code, String message, Object retData) {
         this.code = code;
         this.message = message;
-        this.retDate = retDate;
+        this.retData = retData;
     }
 
     public String getMessage() {
@@ -22,12 +22,12 @@ public class ReturnObject {
         this.message = message;
     }
 
-    public Object getRetDate() {
-        return retDate;
+    public Object getRetData() {
+        return retData;
     }
 
-    public void setRetDate(Object retDate) {
-        this.retDate = retDate;
+    public void setRetData(Object retData) {
+        this.retData = retData;
     }
 
     public String getCode() {

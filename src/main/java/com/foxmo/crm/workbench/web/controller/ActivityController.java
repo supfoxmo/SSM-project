@@ -23,10 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.ws.Response;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 @Controller
@@ -152,8 +149,8 @@ public class ActivityController {
     }
 
     //导出所有市场活动信息
-    @RequestMapping("/workbench/activity/queryAllActivitys.do")
-    public void queryAllActivitys(HttpServletResponse response) throws Exception{
+    @RequestMapping("/workbench/activity/exportAllActivitys.do")
+    public void exportAllActivitys(HttpServletResponse response) throws Exception{
         //调用service层的方法，查询所有市场活动的信息
         List<Activity> activityList = activityService.queryAllActivity();
         //创建HSSFWorkbook对象，对应一个excel文件
@@ -274,8 +271,8 @@ public class ActivityController {
     }
 
     //选择导出
-    @RequestMapping("/workbench/activity/queryActivityByIds.do")
-    public void queryActivityByIds(String[] id, HttpServletResponse response) throws IOException {
+    @RequestMapping("/workbench/activity/exportActivitysByIds.do")
+    public void exportActivitysByIds(String[] id, HttpServletResponse response) throws IOException {
         //调用service层的方法，查询指定的市场活动的信息
         List<Activity> activityList = activityService.queryActivityByIds(id);
         //创建HSSFWorkbook对象，对应一个excel文件
@@ -383,20 +380,24 @@ public class ActivityController {
         //创建集合对象，存储所有市场活动
         List<Activity> activityList = new ArrayList<>();
         //创建返回信息封装类
-        ReturnObject retObject = null;
-        FileInputStream fis = null;
+        ReturnObject retObject = new ReturnObject();
+        InputStream is = null;
         HSSFWorkbook workbook = null;
         try {
             //获取当前登录用户
             User user = (User) session.getAttribute(Constant.SESSION_USER);
             //获取导入的文件名包括后缀
             String originalFilename = activityFile.getOriginalFilename();
+
             //把excel文件在服务器指定的目录中生成一份相同的文件
-            File file = new File("D:\\文档文件\\Excel\\" + originalFilename);//路径必须手动创建好，文件如果不存在，系统会自动生成
-            activityFile.transferTo(file);
+            //效率低
+//            File file = new File("D:\\文档文件\\Excel\\" + originalFilename);//路径必须手动创建好，文件如果不存在，系统会自动生成
+//            activityFile.transferTo(file);
             //根据excel文件生成HSSFWorkbench对象，该类封装了excel文件的所有信息
-            fis = new FileInputStream("D:\\文档文件\\Excel\\" + originalFilename);
-            workbook = new HSSFWorkbook(fis);
+//            fis = new FileInputStream("D:\\文档文件\\Excel\\" + originalFilename);
+
+            is = activityFile.getInputStream();
+            workbook = new HSSFWorkbook(is);
             //根据workbench获取sheet对象，封装一页的所有数据
             HSSFSheet sheet = workbook.getSheetAt(0);
             //根据sheet获取row对象，封装一行的数据
@@ -413,7 +414,7 @@ public class ActivityController {
                 activity.setCreateTime(DateUtils.formatDateTima(new Date()));
 
                 for (int j = 0; j < row.getLastCellNum(); j++) {//row.getLastCellNum():最后一列的下标加一（总列数）
-                    cell = row.getCell(i);
+                    cell = row.getCell(j);
                     String cellValue = HSSFUtils.getCellValueForStr(cell);
                     if (j == 0){
                         activity.setName(cellValue);
@@ -430,12 +431,14 @@ public class ActivityController {
                 //将activity对象存储到集合中
                 activityList.add(activity);
             }
+            //调用service层的方法保存导入的市场活动信息
             int count = activityService.saveActivityByList(activityList);
 
             retObject = new ReturnObject();
 
             retObject.setCode(Constant.RETURN_OBJECT_CODE_SUCCESS);
-            retObject.setRetDate(count);
+            retObject.setRetData(count);
+
         } catch (IOException e) {
             retObject.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
             retObject.setMessage("导入市场活动失败");
@@ -448,7 +451,7 @@ public class ActivityController {
                 e.printStackTrace();
             }
             try {
-                fis.close();
+                is.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

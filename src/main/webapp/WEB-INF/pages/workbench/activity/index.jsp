@@ -303,7 +303,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		//给"批量导出"按钮添加单击事件
 		$("#exportActivityAllBtn").click(function () {
 			//发送同步请求
-			window.location.href="workbench/activity/queryAllActivitys.do";
+			window.location.href="workbench/activity/exportAllActivitys.do";
 		});
 
 		//给“选择导出”按钮添加单击事件
@@ -324,7 +324,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			//取出最后的&符号
 			ids=ids.substr(0,ids.length-1);//id=xxxx&id=xxx&.....&id=xxx
 			//发送同步请求
-			window.location.href = "workbench/activity/queryActivityByIds.do?" + ids;
+			window.location.href = "workbench/activity/exportActivitysByIds.do?" + ids;
 		});
 
 		//给"导入"按钮添加单击事件
