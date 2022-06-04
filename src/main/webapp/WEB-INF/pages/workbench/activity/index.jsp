@@ -406,7 +406,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				$.each(data.activityList,function (index,obj) {
 					htmlStr+="<tr class=\"active\">";
 					htmlStr+="<td><input type=\"checkbox\" value=\""+obj.id+"\"/></td>";
-					htmlStr+="<td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='workbench/activity/detailActivity.do?id="+obj.id+"'\">"+obj.name+"</a></td>";
+					htmlStr+="<td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='workbench/activity/detailActivity.do?activityId="+obj.id+"'\">"+obj.name+"</a></td>";
 					htmlStr+="<td>"+obj.owner+"</td>";
 					htmlStr+="<td>"+obj.startDate+"</td>";
 					htmlStr+="<td>"+obj.endDate+"</td>";

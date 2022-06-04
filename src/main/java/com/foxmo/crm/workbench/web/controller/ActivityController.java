@@ -8,6 +8,8 @@ import com.foxmo.crm.commons.utils.UUIDUtils;
 import com.foxmo.crm.settings.domain.User;
 import com.foxmo.crm.settings.service.UserService;
 import com.foxmo.crm.workbench.domain.Activity;
+import com.foxmo.crm.workbench.domain.ActivityRemark;
+import com.foxmo.crm.workbench.service.ActivityRemarkService;
 import com.foxmo.crm.workbench.service.ActivityService;
 import jdk.nashorn.internal.runtime.ECMAException;
 import org.apache.poi.hssf.usermodel.*;
@@ -32,6 +34,8 @@ public class ActivityController {
     private UserService userService;
     @Autowired
     private ActivityService activityService;
+    @Autowired
+    private ActivityRemarkService activityRemarkService;
 
     @RequestMapping("/workbench/activity/index.do")
     public String index(HttpServletRequest request){
@@ -458,5 +462,18 @@ public class ActivityController {
         }
 
         return retObject;
+    }
+
+    @RequestMapping("/workbench/activity/detailActivity.do")
+    public String detailActivity(String activityId,HttpServletRequest request){
+        //调用service层的方法，查询市场活动信息
+        Activity activity = activityService.queryActivityForDetailById(activityId);
+        //调用service层的方法，查询市场活动评价信息
+        List<ActivityRemark> activityRemarkList = activityRemarkService.queryActivityRemarkByActivityId(activityId);
+        //将查询结果存储到request域中
+        request.setAttribute("activity",activity);
+        request.setAttribute("remarkList",activityRemarkList);
+
+        return "workbench/activity/detail";
     }
 }

@@ -25,4 +25,6 @@ public interface ActivityService {
     List<Activity> queryActivityByIds(String[] ids);
     //根据activityList集合新增市场活动
     int saveActivityByList(List<Activity> activityList);
+    //根据id查询指定市场详细信息
+    Activity queryActivityForDetailById(String id);
 }
