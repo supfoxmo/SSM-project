@@ -59,4 +59,18 @@ public interface ActivityRemarkMapper {
      * @return
      */
     List<ActivityRemark> selectActivityRemarkByActivityId(String activityId);
+
+    /**
+     * 新增市场活动评价
+     * @param activityRemark
+     * @return
+     */
+    int insertActivityRemark(ActivityRemark activityRemark);
+
+    /**
+     * 根据id删除指定市场活动评价信息
+     * @param id
+     * @return
+     */
+    int deleteActivityRemarkById(String id);
 }

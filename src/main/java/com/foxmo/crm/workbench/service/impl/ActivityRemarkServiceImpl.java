@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-@Service
+@Service("activityRemarkService")
 public class ActivityRemarkServiceImpl implements ActivityRemarkService {
     @Autowired
     private ActivityRemarkMapper activityRemarkMapper;
@@ -16,4 +16,15 @@ public class ActivityRemarkServiceImpl implements ActivityRemarkService {
     public List<ActivityRemark> queryActivityRemarkByActivityId(String id) {
         return activityRemarkMapper.selectActivityRemarkByActivityId(id);
     }
+
+    @Override
+    public int saveCreateActivityRemark(ActivityRemark activityRemark) {
+        return activityRemarkMapper.insertActivityRemark(activityRemark);
+    }
+
+    @Override
+    public int removeActivityRemarkById(String id) {
+        return activityRemarkMapper.deleteActivityRemarkById(id);
+    }
+
 }
