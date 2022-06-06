@@ -11,4 +11,6 @@ public interface ActivityRemarkService {
     int saveCreateActivityRemark(ActivityRemark activityRemark);
     //根据id删除指定市场活动信息
     int removeActivityRemarkById(String id);
+    //根据id修改市场活动评价信息
+    int modifyActivityRemarkById(ActivityRemark activityRemark);
 }

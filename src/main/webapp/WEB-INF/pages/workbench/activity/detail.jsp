@@ -159,7 +159,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			}
 			//发送请求
 			$.ajax({
-				url:'workbench/activity/saveEditActivityRemark.do',
+				url:'workbench/activity/modifyActivityRemarkById.do',
 				data:{
 					id:id,
 					noteContent:noteContent
