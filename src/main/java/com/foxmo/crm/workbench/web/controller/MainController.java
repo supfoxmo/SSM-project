@@ -10,4 +10,5 @@ public class MainController {
         //跳转到工作台页面
         return "workbench/main/index";
     }
+
 }
