@@ -46,7 +46,12 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
             var nextContactTime=$.trim($("#create-nextContactTime").val());
             var address        =$.trim($("#create-address").val());
             //表单验证(作业)
-
+			if(fullname == ""){
+				return;
+			}
+			if(owner == ""){
+				return;
+			}
             //带*非空
             //正则表达式验证
 

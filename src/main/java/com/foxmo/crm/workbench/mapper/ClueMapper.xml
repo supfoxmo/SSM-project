@@ -308,9 +308,19 @@
     where id = #{id,jdbcType=CHAR}
   </update>
 
-  <select id="selectAllClue" resultMap="BaseResultMap" parameterType="int">
+  <select id="selectAllClue" resultMap="BaseResultMap">
     select <include refid="Base_Column_List"></include>
     from tbl_clue
   </select>
+
+  <insert id="insertCreateClue" parameterType="com.foxmo.crm.workbench.domain.Clue">
+    insert into tbl_clue(
+      id, fullname, appellation, owner, company, job, email, phone, website, mphone, state,
+      source, create_by, create_time, description, contact_summary, next_contact_time, address
+    )
+    values (
+        #{id},#{fullname},#{appellation},#{owner},#{company},#{job},#{email},#{phone},#{website},#{mphone},#{state},#{source},#{createBy},#{createTime},#{description},#{contactSummary},#{nextContactTime},#{address}
+    )
+  </insert>
 
 </mapper>
