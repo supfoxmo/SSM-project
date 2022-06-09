@@ -45,16 +45,60 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
             var contactSummary =$.trim($("#create-contactSummary").val());
             var nextContactTime=$.trim($("#create-nextContactTime").val());
             var address        =$.trim($("#create-address").val());
-            //表单验证(作业)
+			//表单验证(作业)
+			//带*非空
+
 			if(fullname == ""){
+				alert("姓名不能为空");
 				return;
 			}
 			if(owner == ""){
+				alert("所有者不能为空");
 				return;
 			}
-            //带*非空
-            //正则表达式验证
+			if(company == ""){
+				alert("公司不能为空");
+				return;
+			}
+			//正则表达式验证
+			/*
+			  正则表达式：
+			     1，语言，语法：定义字符串的匹配模式，可以用来判断指定的具体字符串是否符合匹配模式。
+			     2,语法通则：
+			       1)//:在js中定义一个正则表达式.  var regExp=/...../;
+			       2)^：匹配字符串的开头位置
+			         $: 匹配字符串的结尾
+			       3)[]:匹配指定字符集中的一位字符。 var regExp=/^[abc]$/;
+			                                    var regExp=/^[a-z0-9]$/;
+			       4){}:匹配次数.var regExp=/^[abc]{5}$/;
+			            {m}:匹配m此
+			            {m,n}：匹配m次到n次
+			            {m,}：匹配m次或者更多次
+			       5)特殊符号：
+			         \d:匹配一位数字，相当于[0-9]
+			         \D:匹配一位非数字
+			         \w：匹配所有字符，包括字母、数字、下划线。
+			         \W:匹配非字符，除了字母、数字、下划线之外的字符。
 
+			         *:匹配0次或者多次，相当于{0,}
+			         +:匹配1次或者多次，相当于{1,}
+			         ?:匹配0次或者1次，相当于{0,1}
+			 */
+			var regExp1=/^([1-9]\d{10})$/;
+			if(!regExp1.test(mphone)){
+				alert("电话号码格式错误");
+				return;
+			}
+			var regExp2=/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
+			if(!regExp2.test(email)){
+				alert("邮箱格式错误");
+				return;
+			}
+			var regExp3=/^[0-9]{3}-[0-9]{5,20}&/
+			if (!regExp3.test(phone)){
+				alert("公司座机格式错误");
+				return;
+			}
             //发送请求
             $.ajax({
                 url:'workbench/clue/saveCreateClue.do',
@@ -95,6 +139,83 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 
 
 	});
+
+	//查询指定页码的线索信息
+	function queryClueByConditionForPage(pageNo,pageSize) {
+		//收集参数
+		var name=$("#form-control").val();
+		var owner=$("#query-owner").val();
+		var startDate=$("#query-startDate").val();
+		var endDate=$("#query-endDate").val();
+		//var pageNo=1;
+		//var pageSize=10;
+		//发送请求
+		$.ajax({
+			url:'workbench/activity/queryActivityByConditionForPage.do',
+			data:{
+				name:name,
+				owner:owner,
+				startDate:startDate,
+				endDate:endDate,
+				pageNo:pageNo,
+				pageSize:pageSize
+			},
+			type:'post',
+			dataType:'json',
+			success:function (data) {
+				//显示总条数
+				//$("#totalRowsB").text(data.totalRows);
+				//显示市场活动的列表
+				//遍历activityList，拼接所有行数据
+				var htmlStr="";
+				$.each(data.activityList,function (index,obj) {
+					htmlStr+="<tr class=\"active\">";
+					htmlStr+="<td><input type=\"checkbox\" value=\""+obj.id+"\"/></td>";
+					htmlStr+="<td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='workbench/activity/detailActivity.do?activityId="+obj.id+"'\">"+obj.name+"</a></td>";
+					htmlStr+="<td>"+obj.owner+"</td>";
+					htmlStr+="<td>"+obj.startDate+"</td>";
+					htmlStr+="<td>"+obj.endDate+"</td>";
+					htmlStr+="</tr>";
+				});
+				$("#tBody").html(htmlStr);
+
+				//取消"全选"按钮
+				$("#chckAll").prop("checked",false);
+
+				//计算总页数
+				var totalPages=1;
+				if(data.totalRows%pageSize==0){
+					totalPages=data.totalRows/pageSize;
+				}else{
+					totalPages=parseInt(data.totalRows/pageSize)+1;
+				}
+
+				//对容器调用bs_pagination工具函数，显示翻页信息
+				$("#demo_pag1").bs_pagination({
+					currentPage:pageNo,//当前页号,相当于pageNo
+
+					rowsPerPage:pageSize,//每页显示条数,相当于pageSize
+					totalRows:data.totalRows,//总条数
+					totalPages: totalPages,  //总页数,必填参数.
+
+					visiblePageLinks:5,//最多可以显示的卡片数
+
+					showGoToPage:true,//是否显示"跳转到"部分,默认true--显示
+					showRowsPerPage:true,//是否显示"每页显示条数"部分。默认true--显示
+					showRowsInfo:true,//是否显示记录的信息，默认true--显示
+
+					//用户每次切换页号，都自动触发本函数;
+					//每次返回切换页号之后的pageNo和pageSize
+					onChangePage: function(event,pageObj) { // returns page_num and rows_per_page after a link has clicked
+						//js代码
+						//alert(pageObj.currentPage);
+						//alert(pageObj.rowsPerPage);
+						queryActivityByConditionForPage(pageObj.currentPage,pageObj.rowsPerPage);
+					}
+				});
+			}
+		});
+	}
 
 </script>
 </head>
@@ -400,21 +521,21 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">名称</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" type="text" id="query-name">
 				    </div>
 				  </div>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">公司</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" type="text" id="query-company">
 				    </div>
 				  </div>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">公司座机</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" type="text" id="query-phone">
 				    </div>
 				  </div>
 				  
