@@ -27,4 +27,6 @@ public interface ActivityService {
     int saveActivityByList(List<Activity> activityList);
     //根据id查询指定市场详细信息
     Activity queryActivityForDetailById(String id);
+    //根据clueId查询所有与线索相关联的市场活动信息
+    List<Activity> queryActivityForDetailByClueId(String clueId);
 }

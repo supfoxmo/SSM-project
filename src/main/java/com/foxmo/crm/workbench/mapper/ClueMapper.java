@@ -65,4 +65,11 @@ public interface ClueMapper {
      * @return
      */
     int insertCreateClue(Clue clue);
+
+    /**
+     * 查询线索的详细信息
+     * @param id
+     * @return
+     */
+    Clue selectClueForDetailById(String id);
 }

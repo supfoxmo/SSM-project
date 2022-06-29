@@ -8,9 +8,14 @@ import com.foxmo.crm.settings.domain.DicValue;
 import com.foxmo.crm.settings.domain.User;
 import com.foxmo.crm.settings.service.DicValueService;
 import com.foxmo.crm.settings.service.UserService;
+import com.foxmo.crm.workbench.domain.Activity;
 import com.foxmo.crm.workbench.domain.Clue;
+import com.foxmo.crm.workbench.domain.ClueRemark;
+import com.foxmo.crm.workbench.service.ActivityService;
+import com.foxmo.crm.workbench.service.ClueRemarkService;
 import com.foxmo.crm.workbench.service.ClueService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -28,6 +33,10 @@ public class ClueController {
     public DicValueService dicValueService;
     @Autowired
     public ClueService clueService;
+    @Autowired
+    public ClueRemarkService clueRemarkService;
+    @Autowired
+    public ActivityService activityService;
 
     @RequestMapping("/workbench/clue/index.do")
     public String clueIndex(HttpServletRequest request){
@@ -75,5 +84,19 @@ public class ClueController {
             e.printStackTrace();
         }
         return returnObject;
+    }
+
+    @RequestMapping("/workbench/clue/clueDetail.do")
+    public String clueDetail(String id,HttpServletRequest request){
+        //调用service层的方法，查询数据
+        Clue clue = clueService.queryClueForDetailById(id);
+        List<ClueRemark> remarkList = clueRemarkService.queryClueRemarkForDetailByClueId(id);
+        List<Activity> activityList = activityService.queryActivityForDetailByClueId(id);
+        //将查询到的数据存放到request域中
+        request.setAttribute("clue",clue);
+        request.setAttribute("remarkList",remarkList);
+        request.setAttribute("activityList",activityList);
+        //跳转到线索详情页面
+        return "workbench/clue/detail";
     }
 }

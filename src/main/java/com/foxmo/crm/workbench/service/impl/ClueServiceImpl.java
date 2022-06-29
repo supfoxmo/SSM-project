@@ -15,4 +15,9 @@ public class ClueServiceImpl implements ClueService {
     public int saveCreateClue(Clue clue) {
         return clueMapper.insertCreateClue(clue);
     }
+
+    @Override
+    public Clue queryClueForDetailById(String id) {
+        return clueMapper.selectClueForDetailById(id);
+    }
 }
