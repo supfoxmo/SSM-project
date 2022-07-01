@@ -1,10 +1,14 @@
 package com.foxmo.crm.workbench.service.impl;
 
+import com.foxmo.crm.workbench.domain.Activity;
 import com.foxmo.crm.workbench.domain.Clue;
 import com.foxmo.crm.workbench.mapper.ClueMapper;
 import com.foxmo.crm.workbench.service.ClueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ClueServiceImpl implements ClueService {
@@ -19,5 +23,15 @@ public class ClueServiceImpl implements ClueService {
     @Override
     public Clue queryClueForDetailById(String id) {
         return clueMapper.selectClueForDetailById(id);
+    }
+
+    @Override
+    public List<Clue> queryClueByConditionForPage(Map<String, Object> map) {
+        return clueMapper.selectClueByConditionForPage(map);
+    }
+
+    @Override
+    public int queryConutOfClueByCondition(Map<String, Object> map) {
+        return clueMapper.selectConutOfClueByCondition(map);
     }
 }

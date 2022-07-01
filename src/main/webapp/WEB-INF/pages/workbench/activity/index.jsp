@@ -310,7 +310,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		$("#exportActivityXzBtn").click(function () {
 			//收集参数
 			//获取列表中所有被选中的checkbox
-			var chekkedIds=$("#tBody input[type='checkbox']:checked");
+			tBody
 			if(chekkedIds.size() == 0){
 				alert("请选择要导出市场活动");
 				return;

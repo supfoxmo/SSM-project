@@ -1,8 +1,10 @@
 package com.foxmo.crm.workbench.mapper;
 
+import com.foxmo.crm.workbench.domain.Activity;
 import com.foxmo.crm.workbench.domain.Clue;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ClueMapper {
     /**
@@ -72,4 +74,18 @@ public interface ClueMapper {
      * @return
      */
     Clue selectClueForDetailById(String id);
+
+    /**
+     * 根据条件分页查询市场活动信息
+     * @param map
+     * @return
+     */
+    List<Clue> selectClueByConditionForPage(Map<String,Object> map);
+
+    /**
+     * 根据条件查询指定市场活动的总条数
+     * @param map
+     * @return
+     */
+    int selectConutOfClueByCondition(Map<String,Object> map);
 }

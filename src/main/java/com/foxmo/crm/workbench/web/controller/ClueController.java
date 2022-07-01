@@ -23,7 +23,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class ClueController {
@@ -98,5 +100,32 @@ public class ClueController {
         request.setAttribute("activityList",activityList);
         //跳转到线索详情页面
         return "workbench/clue/detail";
+    }
+
+    @ResponseBody
+    @RequestMapping("/workbench/clue/queryClueByConditionForPage.do")
+    public Object queryClueByConditionForPage(String fullname,String company,String phone,String source,String owner,String mphone,String state,int pageNo,int pageSize){
+        //封装请求参数
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("fullname",fullname);
+        map.put("company",company);
+        map.put("phone",phone);
+        map.put("source",source);
+        map.put("owner",owner);
+        map.put("mphone",mphone);
+        map.put("state",state);
+        map.put("beginNo",(pageNo-1)*pageSize);
+        map.put("pageSize",pageSize);
+
+        //调用service层的方法查询数据
+        List<Clue> clueList = clueService.queryClueByConditionForPage(map);
+        int totalRows = clueService.queryConutOfClueByCondition(map);
+
+        //封装查询结果
+        Map<String, Object> retMap = new HashMap<>();
+        retMap.put("clueList",clueList);
+        retMap.put("totalRows",totalRows);
+
+        return retMap;
     }
 }
