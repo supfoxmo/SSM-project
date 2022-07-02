@@ -10,11 +10,15 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 
 <link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
 <link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="jquery/bs_pagination-master/css/jquery.bs_pagination.min.css">
+
 
 <script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
 <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
 <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
+<script type="text/javascript" src="jquery/bs_pagination-master/js/jquery.bs_pagination.min.js"></script>
+<script type="text/javascript" src="jquery/bs_pagination-master/localization/en.js"></script>
 
 <script type="text/javascript">
 
@@ -95,11 +99,11 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				return;
 			}
 			// var regExp3=/^[0-9]{3}-[0-9]{5,20}&/
-			// var regExp3=/^0\d{2,3}-\d{7,8}&/
-			if (!regExp3.test(phone)){
-				alert("公司座机格式错误");
-				return;
-			}
+			// var regExp3=/^\d{3}-\d[7-8]&/
+			// if (!regExp3.test(phone)){
+			// 	alert("公司座机格式错误");
+			// 	return;
+			// }
             //发送请求
             $.ajax({
                 url:'workbench/clue/saveCreateClue.do',
@@ -127,7 +131,10 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
                         //关闭模态窗口
                         $("#createClueModal").modal("hide");
                         //刷新线索列表，显示第一页数据，保持每页显示条数不变(作业)
+						// queryClueByConditionForPage(1,10);
 
+						//刷新市场活动列，显示第一页数据，保持每页显示条数不变
+						queryClueByConditionForPage(1,$("#demo_pag1").bs_pagination('getOption', 'rowsPerPage'));
                     }else{
                         //提示信息
                         alert(data.message);
@@ -141,14 +148,176 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
         //查询首页线索信息，并更新列表
 		queryClueByConditionForPage(1,10);
 
-		//条件查询线索信息
+		//给"查询"按钮添加单击事件
 		$("#queryClueBtn").click(function () {
+			//查询所有符合条件数据的第一页以及所有符合条件数据的总条数;
+			queryClueByConditionForPage(1,$("#demo_pag1").bs_pagination('getOption', 'rowsPerPage'));
+		});
 
-			queryClueByConditionForPage(1,10);
+		//给"全选"按钮添加单击事件
+		$("#chckAll").click(function () {
+			//如果"全选"按钮是选中状态，则列表中所有checkbox都选中
+			/*if(this.checked==true){
+				$("#tBody input[type='checkbox']").prop("checked",true);
+			}else{
+				$("#tBody input[type='checkbox']").prop("checked",false);
+			}*/
 
+			$("#tBody input[type='checkbox']").prop("checked",this.checked);
+		});
+
+		$("#tBody").on("click","input[type='checkbox']",function () {
+			//如果列表中的所有checkbox都选中，则"全选"按钮也选中
+			if($("#tBody input[type='checkbox']").size()==$("#tBody input[type='checkbox']:checked").size()){
+				$("#chckAll").prop("checked",true);
+			}else{//如果列表中的所有checkbox至少有一个没选中，则"全选"按钮也取消
+				$("#chckAll").prop("checked",false);
+			}
+		});
+
+		//删除选中的线索信息
+		$("#removeClueBtn").click(function () {
+			//收集参数
+			//获取列表中所有被选中的checkbox
+			var chekkedIds=$("#tBody input[type='checkbox']:checked");
+			if(chekkedIds.size()==0){
+				alert("请选择要删除的市场活动");
+				return;
+			}
+
+			if(window.confirm("确定删除吗？")){
+				var ids="";
+				$.each(chekkedIds,function () {//id=xxxx&id=xxx&.....&id=xxx&
+					ids+="id="+this.value+"&";
+				});
+				ids=ids.substr(0,ids.length-1);//id=xxxx&id=xxx&.....&id=xxx
+
+				//发送请求
+				$.ajax({
+					url:'workbench/clue/removeClueByIds.do',
+					data:ids,
+					type:'post',
+					dataType:'json',
+					success:function (data) {
+						if(data.code=="1"){
+							//刷新市场活动列表,显示第一页数据,保持每页显示条数不变
+							queryClueByConditionForPage(1,$("#demo_pag1").bs_pagination('getOption', 'rowsPerPage'));
+						}else{
+							//提示信息
+							alert(data.message);
+						}
+					}
+				});
+			}
+		})
+
+		//给"修改"按钮添加单击事件，弹出模态窗口，显示指定线索的详细信息
+		$("#editClueBtn").click(function () {
+			//收集参数
+			//获取列表中被选中的checkbox
+			var chkedIds=$("#tBody input[type='checkbox']:checked");
+			if(chkedIds.size()==0){
+				alert("请选择要修改的市场活动");
+				return;
+			}
+			if(chkedIds.size()>1){
+				alert("每次只能修改一条市场活动");
+				return;
+			}
+			//var id=chkedIds.val();
+			//var id=chkedIds.get(0).value;
+			var id=chkedIds[0].value;
+			//发送请求
+			$.ajax({
+				url:'workbench/clue/queryClueById.do',
+				data:{
+					id:id
+				},
+				type:'post',
+				dataType:'json',
+				success:function (data) {
+					//把市场活动的信息显示在修改的模态窗口上
+					$("#edit-id").val(data.id);
+					$("#edit-fullname").val(data.fullname);
+					$("#edit-owner").val(data.owner);
+					$("#edit-company").val(data.company);
+					$("#edit-job").val(data.job);
+					$("#edit-email").val(data.email);
+					$("#edit-phone").val(data.phone);
+					$("#edit-website").val(data.website);
+					$("#edit-mphone").val(data.mphone);
+					$("#edit-state").val(data.state);
+					$("#edit-source").val(data.source);
+					$("#edit-description").val(data.description);
+					$("#edit-contactSummary").val(data.contactSummary);
+					$("#edit-nextContactTime").val(data.nextContactTime);
+					$("#edit-address").val(data.address);
+					//弹出模态窗口
+					$("#editClueModal").modal("show");
+				}
+			});
+		})
+
+		//给"更新"按钮添加单击事件,修改选中线索信息
+		$("#editClueForDetailBtn").click(function () {
+			//获取修改后的线索参数
+			var id = $("#edit-id").val();
+			var fullname = $("#edit-fullname").val();
+			var owner = $("#edit-owner").val();
+			var company = $("#edit-company").val();
+			var job = $("#edit-job").val();
+			var email = $("#edit-email").val();
+			var phone = $("#edit-phone").val();
+			var website = $("#edit-website").val();
+			var mphone = $("#edit-mphone").val();
+			var state = $("#edit-state").val();
+			var source = $("#edit-source").val();
+			var description = $("#edit-description").val();
+			var contactSummary = $("#edit-contactSummary").val();
+			var nextContactTime = $("#edit-nextContactTime").val();
+			var address = $("#edit-address").val();
+			
+			//发送请求
+			$.ajax({
+				url : 'workbench/clue/editClueForDetailById.do',
+				data : {
+					id : id,
+					fullname : fullname,
+					owner : owner,
+					company : company,
+					job : job,
+					email : email,
+					phone : phone,
+					website : website,
+					mphone : mphone,
+					state : state,
+					source : source,
+					description : description,
+					contactSummary : contactSummary,
+					nextContactTime : nextContactTime,
+					address : address
+				},
+				type : 'post',
+				dataType : 'json',
+				success : function (data) {
+					if(data.code=="1"){
+						//关闭模态窗口
+						$("#editClueModal").modal("hide");
+						//刷新市场活动列表,保持页号和每页显示条数都不变
+						queryClueByConditionForPage($("#demo_pag1").bs_pagination('getOption', 'currentPage'),$("#demo_pag1").bs_pagination('getOption', 'rowsPerPage'));
+					}else{
+						//提示信息
+						alert(data.message);
+						//模态窗口不关闭
+						$("#editClueModal").modal("show");
+					}
+				}
+			})
 		})
 	});
 
+
+	//分页条件查询线索信息
 	function queryClueByConditionForPage(pageNo,pageSize){
 		//收集查询条件查询参数
 		var fullname = $("#query-fullname").val();
@@ -159,19 +328,20 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		var mphone = $("#query-mphone").val();
 		var state = $("#query-state").val();
 
+
 		//发送请求
 		$.ajax({
 			url: 'workbench/clue/queryClueByConditionForPage.do',
 			data:{
-				fullname : fullname,
-				company : company,
-				phone : phone,
-				source : source,
-				owner : owner,
-				mphone : mphone,
-				state : state,
-				pageNo : pageNo,
-				pageSize : pageSize
+				fullname:fullname,
+				company:company,
+				phone:phone,
+				source:source,
+				owner:owner,
+				mphone:mphone,
+				state:state,
+				pageNo:pageNo,
+				pageSize:pageSize
 			},
 			type: 'post',
 			dataType: 'json',
@@ -196,7 +366,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				$("#tBody").html(htmlStr);
 
 				//取消"全选"按钮
-				// $("#chckAll").prop("checked",false);
+				$("#chckAll").prop("checked",false);
 
 				//计算总页数
 				var totalPages=1;
@@ -224,91 +394,14 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 					//每次返回切换页号之后的pageNo和pageSize
 					onChangePage: function(event,pageObj) { // returns page_num and rows_per_page after a link has clicked
 						//js代码
-						//alert(pageObj.currentPage);
-						//alert(pageObj.rowsPerPage);
-						queryActivityByConditionForPage(pageObj.currentPage,pageObj.rowsPerPage);
+						// alert(pageObj.currentPage);
+						// alert(pageObj.rowsPerPage);
+						queryClueByConditionForPage(pageObj.currentPage,pageObj.rowsPerPage);
 					}
 				});
 			}
 		})
 	}
-
-	// function queryActivityByConditionForPage(pageNo,pageSize) {
-	// 	//收集参数
-	// 	var name=$("#query-name").val();
-	// 	var owner=$("#query-owner").val();
-	// 	var startDate=$("#query-startDate").val();
-	// 	var endDate=$("#query-endDate").val();
-	// 	//var pageNo=1;
-	// 	//var pageSize=10;
-	// 	//发送请求
-	// 	$.ajax({
-	// 		url:'workbench/activity/queryActivityByConditionForPage.do',
-	// 		data:{
-	// 			name:name,
-	// 			owner:owner,
-	// 			startDate:startDate,
-	// 			endDate:endDate,
-	// 			pageNo:pageNo,
-	// 			pageSize:pageSize
-	// 		},
-	// 		type:'post',
-	// 		dataType:'json',
-	// 		success:function (data) {
-	// 			//显示总条数
-	// 			//$("#totalRowsB").text(data.totalRows);
-	// 			//显示市场活动的列表
-	// 			//遍历activityList，拼接所有行数据
-	// 			var htmlStr="";
-	// 			$.each(data.activityList,function (index,obj) {
-	// 				htmlStr+="<tr class=\"active\">";
-	// 				htmlStr+="<td><input type=\"checkbox\" value=\""+obj.id+"\"/></td>";
-	// 				htmlStr+="<td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='workbench/activity/detailActivity.do?activityId="+obj.id+"'\">"+obj.name+"</a></td>";
-	// 				htmlStr+="<td>"+obj.owner+"</td>";
-	// 				htmlStr+="<td>"+obj.startDate+"</td>";
-	// 				htmlStr+="<td>"+obj.endDate+"</td>";
-	// 				htmlStr+="</tr>";
-	// 			});
-	// 			$("#tBody").html(htmlStr);
-	//
-	// 			//取消"全选"按钮
-	// 			$("#chckAll").prop("checked",false);
-	//
-	// 			//计算总页数
-	// 			var totalPages=1;
-	// 			if(data.totalRows%pageSize==0){
-	// 				totalPages=data.totalRows/pageSize;
-	// 			}else{
-	// 				totalPages=parseInt(data.totalRows/pageSize)+1;
-	// 			}
-	//
-	// 			//对容器调用bs_pagination工具函数，显示翻页信息
-	// 			$("#demo_pag1").bs_pagination({
-	// 				currentPage:pageNo,//当前页号,相当于pageNo
-	//
-	// 				rowsPerPage:pageSize,//每页显示条数,相当于pageSize
-	// 				totalRows:data.totalRows,//总条数
-	// 				totalPages: totalPages,  //总页数,必填参数.
-	//
-	// 				visiblePageLinks:5,//最多可以显示的卡片数
-	//
-	// 				showGoToPage:true,//是否显示"跳转到"部分,默认true--显示
-	// 				showRowsPerPage:true,//是否显示"每页显示条数"部分。默认true--显示
-	// 				showRowsInfo:true,//是否显示记录的信息，默认true--显示
-	//
-	// 				//用户每次切换页号，都自动触发本函数;
-	// 				//每次返回切换页号之后的pageNo和pageSize
-	// 				onChangePage: function(event,pageObj) { // returns page_num and rows_per_page after a link has clicked
-	// 					//js代码
-	// 					//alert(pageObj.currentPage);
-	// 					//alert(pageObj.rowsPerPage);
-	// 					queryActivityByConditionForPage(pageObj.currentPage,pageObj.rowsPerPage);
-	// 				}
-	// 			});
-	// 		}
-	// 	});
-	// }
-
 
 </script>
 </head>
@@ -470,7 +563,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						<div class="form-group">
 							<label for="edit-clueOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
-								<select class="form-control" id="edit-clueOwner">
+								<select class="form-control" id="edit-owner">
                                     <c:forEach items="${userList}" var="u">
                                         <option value="${u.id}">${u.name}</option>
                                     </c:forEach>
@@ -478,14 +571,14 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 							</div>
 							<label for="edit-company" class="col-sm-2 control-label">公司<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-company" value="动力节点">
+								<input type="text" class="form-control" id="edit-company">
 							</div>
 						</div>
 						
 						<div class="form-group">
 							<label for="edit-call" class="col-sm-2 control-label">称呼</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<select class="form-control" id="edit-call">
+								<select class="form-control" id="edit-appellation">
 								  <option></option>
                                     <c:forEach items="${appellationList}" var="app">
                                         <option value="${app.id}">${app.value}</option>
@@ -494,40 +587,40 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 							</div>
 							<label for="edit-surname" class="col-sm-2 control-label">姓名<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-surname" value="李四">
+								<input type="text" class="form-control" id="edit-fullname">
 							</div>
 						</div>
 						
 						<div class="form-group">
 							<label for="edit-job" class="col-sm-2 control-label">职位</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-job" value="CTO">
+								<input type="text" class="form-control" id="edit-job">
 							</div>
 							<label for="edit-email" class="col-sm-2 control-label">邮箱</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-email" value="lisi@bjpowernode.com">
+								<input type="text" class="form-control" id="edit-email">
 							</div>
 						</div>
 						
 						<div class="form-group">
 							<label for="edit-phone" class="col-sm-2 control-label">公司座机</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-phone" value="010-84846003">
+								<input type="text" class="form-control" id="edit-phone">
 							</div>
 							<label for="edit-website" class="col-sm-2 control-label">公司网站</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-website" value="http://www.bjpowernode.com">
+								<input type="text" class="form-control" id="edit-website">
 							</div>
 						</div>
 						
 						<div class="form-group">
 							<label for="edit-mphone" class="col-sm-2 control-label">手机</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-mphone" value="12345678901">
+								<input type="text" class="form-control" id="edit-mphone">
 							</div>
 							<label for="edit-status" class="col-sm-2 control-label">线索状态</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<select class="form-control" id="edit-status">
+								<select class="form-control" id="edit-state">
 								  <option></option>
                                     <c:forEach items="${clueStateList}" var="cs">
                                         <option value="${cs.id}">${cs.value}</option>
@@ -551,7 +644,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						<div class="form-group">
 							<label for="edit-describe" class="col-sm-2 control-label">描述</label>
 							<div class="col-sm-10" style="width: 81%;">
-								<textarea class="form-control" rows="3" id="edit-describe">这是一条线索的描述信息</textarea>
+								<textarea class="form-control" rows="3" id="edit-description"></textarea>
 							</div>
 						</div>
 						
@@ -561,13 +654,13 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 							<div class="form-group">
 								<label for="edit-contactSummary" class="col-sm-2 control-label">联系纪要</label>
 								<div class="col-sm-10" style="width: 81%;">
-									<textarea class="form-control" rows="3" id="edit-contactSummary">这个线索即将被转换</textarea>
+									<textarea class="form-control" rows="3" id="edit-contactSummary"></textarea>
 								</div>
 							</div>
 							<div class="form-group">
 								<label for="edit-nextContactTime" class="col-sm-2 control-label">下次联系时间</label>
 								<div class="col-sm-10" style="width: 300px;">
-									<input type="text" class="form-control" id="edit-nextContactTime" value="2017-05-01">
+									<input type="text" class="form-control" id="edit-nextContactTime">
 								</div>
 							</div>
 						</div>
@@ -578,7 +671,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
                             <div class="form-group">
                                 <label for="edit-address" class="col-sm-2 control-label">详细地址</label>
                                 <div class="col-sm-10" style="width: 81%;">
-                                    <textarea class="form-control" rows="1" id="edit-address">北京大兴区大族企业湾</textarea>
+                                    <textarea class="form-control" rows="1" id="edit-address"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -587,7 +680,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">更新</button>
+					<button type="button" class="btn btn-primary" data-dismiss="modal" id="editClueForDetailBtn">更新</button>
 				</div>
 			</div>
 		</div>
@@ -614,7 +707,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">名称</div>
-				      <input class="form-control" type="text" id="query-name">
+				      <input class="form-control" type="text" id="query-fullname">
 				    </div>
 				  </div>
 				  
@@ -672,15 +765,15 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				    </div>
 				  </div>
 
-				  <button type="submit" class="btn btn-default" id="queryClueBtn">查询</button>
+				  <button type="button" class="btn btn-default" id="queryClueBtn">查询</button>
 				  
 				</form>
 			</div>
 			<div class="btn-toolbar" role="toolbar" style="background-color: #F7F7F7; height: 50px; position: relative;top: 40px;">
 				<div class="btn-group" style="position: relative; top: 18%;">
 				  <button type="button" class="btn btn-primary" id="createClueBtn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
-				  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#editClueModal"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
-				  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+				  <button type="button" class="btn btn-default" id="editClueBtn"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
+				  <button type="button" class="btn btn-danger" id="removeClueBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 				</div>
 				
 				
@@ -689,7 +782,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				<table class="table table-hover">
 					<thead>
 						<tr style="color: #B3B3B3;">
-							<td><input type="checkbox" /></td>
+							<td><input type="checkbox" id="chckAll"/></td>
 							<td>名称</td>
 							<td>公司</td>
 							<td>公司座机</td>

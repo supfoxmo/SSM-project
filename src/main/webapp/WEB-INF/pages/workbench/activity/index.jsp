@@ -310,7 +310,6 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		$("#exportActivityXzBtn").click(function () {
 			//收集参数
 			//获取列表中所有被选中的checkbox
-			tBody
 			if(chekkedIds.size() == 0){
 				alert("请选择要导出市场活动");
 				return;
@@ -419,7 +418,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 
 				//计算总页数
 				var totalPages=1;
-				if(data.totalRows%pageSize==0){
+				if(data.totalRows % pageSize==0){
 					totalPages=data.totalRows/pageSize;
 				}else{
 					totalPages=parseInt(data.totalRows/pageSize)+1;

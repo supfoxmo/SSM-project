@@ -88,4 +88,25 @@ public interface ClueMapper {
      * @return
      */
     int selectConutOfClueByCondition(Map<String,Object> map);
+
+    /**
+     * 根据ID数组删除指定的线索信息
+     * @param ids
+     * @return
+     */
+    int deleteClueByIds(String[] ids);
+
+    /**
+     * 根据id查询指定线索信息
+     * @param id
+     * @return
+     */
+    Clue selectClueById(String id);
+
+    /**
+     * 根据Id修改指定线索信息
+     * @param clue
+     * @return
+     */
+    int updateClueForDetailById(Clue clue);
 }

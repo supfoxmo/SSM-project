@@ -404,4 +404,46 @@
     </where>
   </select>
 
+  <delete id="deleteClueByIds" parameterType="string">
+    delete from tbl_clue
+    where id in
+    <foreach collection="array" item="id" open="(" separator="," close=")" >
+      #{id}
+    </foreach>
+  </delete>
+
+  <select id="selectClueById" parameterType="string" resultMap="BaseResultMap">
+    select c.id,c.fullname,c.appellation,c.owner,c.company,c.job,c.email,c.phone,
+           c.website,c.mphone,c.state,c.source,u1.name as create_by,c.create_time,u2.name as edit_by,
+           c.edit_time,c.description,c.contact_summary,c.next_contact_time,c.address
+    from tbl_clue c
+           join tbl_user u1 on c.create_by = u1.id
+           left join tbl_user u2 on c.edit_by = u2.id
+    where c.id = #{id}
+  </select>
+  
+  <update id="updateClueForDetailById" parameterType="com.foxmo.crm.workbench.domain.Clue">
+    update tbl_clue
+    set fullname = #{fullname},
+        appellation = #{appellation},
+        owner = #{owner},
+        company = #{company},
+        job = #{job},
+        email = #{email},
+        phone = #{phone},
+        website = #{website},
+        mphone = #{mphone},
+        state = #{state},
+        source = #{source},
+        create_by = #{createBy},
+        create_time = #{createTime},
+        edit_by = #{editBy},
+        edit_time = #{editTime},
+        description = #{description},
+        contact_summary = #{contactSummary},
+        next_contact_time = #{nextContactTime},
+        address = #{address}
+    where id = #{id,jdbcType=CHAR}
+  </update>
+
 </mapper>

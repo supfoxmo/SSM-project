@@ -74,6 +74,7 @@ public class ClueController {
             if (count > 0){
                 //新增成功
                 returnObject.setCode(Constant.RETURN_OBJECT_CODE_SUCCESS);
+                returnObject.setMessage("保存成功");
             }else{
                 //新增失败
                 returnObject.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
@@ -128,4 +129,72 @@ public class ClueController {
 
         return retMap;
     }
+
+    @ResponseBody
+    @RequestMapping("/workbench/clue/removeClueByIds.do")
+    public Object removeClueByIds(String[] id){
+        //创建响应封装对象
+        ReturnObject returnObject = new ReturnObject();
+        try{
+            //调用service层的方法，删除指定线索信息
+            int count = clueService.removeClueByIds(id);
+            //判断运行结果
+            if (count > 0 ){
+                //删除成功
+                returnObject.setCode(Constant.RETURN_OBJECT_CODE_SUCCESS);
+                returnObject.setMessage("删除成功!!!");
+            }else{
+                //删除失败
+                returnObject.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
+                returnObject.setMessage("当前系统繁忙，请稍后重试。。。。");
+            }
+        }catch (Exception e){
+            //删除失败
+            returnObject.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
+            returnObject.setMessage("当前系统繁忙，请稍后重试。。。。");
+            e.printStackTrace();
+        }
+        //返回响应对象
+        return returnObject;
+    }
+
+    @ResponseBody
+    @RequestMapping("/workbench/clue/queryClueById.do")
+    public Object queryClueById(String id){
+        //调用service层的方法，查询指定线索信息,并返回线索对象
+        return clueService.queryClueById(id);
+    }
+
+    @ResponseBody
+    @RequestMapping("/workbench/clue/editClueForDetailById.do")
+    public Object editClueForDetailById(Clue clue,HttpSession session){
+        //获取当前登录用户
+        User user = (User)session.getAttribute(Constant.SESSION_USER);
+        //进一步封装数据
+        clue.setEditBy(user.getId());
+        clue.setEditTime(DateUtils.formatDateTima(new Date()));
+        //创建响应封装对象
+        ReturnObject returnObject = new ReturnObject();
+        try{
+            //调用service层的方法，修改指定线索信息
+            int count = clueService.editClueForDetailById(clue);
+            //判断线索信息是否修改成功
+            if (count > 0){
+                //修改成功
+                returnObject.setCode(Constant.RETURN_OBJECT_CODE_SUCCESS);
+                returnObject.setMessage("修改成功！！！");
+            }else {
+                //修改失败
+                returnObject.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
+                returnObject.setMessage("当前系统繁忙，请稍后重试。。。");
+            }
+        }catch (Exception e){
+            //修改失败
+            returnObject.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
+            returnObject.setMessage("当前系统繁忙，请稍后重试。。。");
+            e.printStackTrace();
+        }
+        return returnObject;
+    }
+
 }
