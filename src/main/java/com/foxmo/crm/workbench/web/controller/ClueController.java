@@ -89,19 +89,6 @@ public class ClueController {
         return returnObject;
     }
 
-    @RequestMapping("/workbench/clue/clueDetail.do")
-    public String clueDetail(String id,HttpServletRequest request){
-        //调用service层的方法，查询数据
-        Clue clue = clueService.queryClueForDetailById(id);
-        List<ClueRemark> remarkList = clueRemarkService.queryClueRemarkForDetailByClueId(id);
-        List<Activity> activityList = activityService.queryActivityForDetailByClueId(id);
-        //将查询到的数据存放到request域中
-        request.setAttribute("clue",clue);
-        request.setAttribute("remarkList",remarkList);
-        request.setAttribute("activityList",activityList);
-        //跳转到线索详情页面
-        return "workbench/clue/detail";
-    }
 
     @ResponseBody
     @RequestMapping("/workbench/clue/queryClueByConditionForPage.do")
@@ -195,6 +182,33 @@ public class ClueController {
             e.printStackTrace();
         }
         return returnObject;
+    }
+
+    @RequestMapping("/workbench/clue/clueDetail.do")
+    public String clueDetail(String id,HttpServletRequest request){
+        //调用service层的方法，查询数据
+        Clue clue = clueService.queryClueForDetailById(id);
+        List<ClueRemark> remarkList = clueRemarkService.queryClueRemarkForDetailByClueId(id);
+        List<Activity> activityList = activityService.queryActivityForDetailByClueId(id);
+        //将查询到的数据存放到request域中
+        request.setAttribute("clue",clue);
+        request.setAttribute("remarkList",remarkList);
+        request.setAttribute("activityList",activityList);
+        //跳转到线索详情页面
+        return "workbench/clue/detail";
+    }
+
+    @ResponseBody
+    @RequestMapping("/workbench/clue/queryActivityForDetailByNameClueId.do")
+    public Object queryActivityForDetailByNameClueId(String activityName,String clueId){
+        //封装参数
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("activityName",activityName);
+        map.put("clueId",clueId);
+        //调用service层的方法，查询市场活动信息
+        List<Activity> activityList = activityService.queryActivityForDetailByNameClueId(map);
+        //返回响应对象
+        return activityList;
     }
 
 }

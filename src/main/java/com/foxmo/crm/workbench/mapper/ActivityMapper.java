@@ -2,6 +2,7 @@ package com.foxmo.crm.workbench.mapper;
 
 import com.foxmo.crm.workbench.domain.Activity;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -120,4 +121,11 @@ public interface ActivityMapper {
      * @return
      */
     List<Activity> selectActivityForDetailByClueId(String clueId);
+
+    /**
+     * 根据Name模糊查询市场活动详细信息，并排除已经和ClueID关联的市场活动
+     * @param map
+     * @return
+     */
+    List<Activity> selectActivityForDetailByNameClueId(HashMap<String,Object> map);
 }

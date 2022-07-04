@@ -3,6 +3,7 @@ package com.foxmo.crm.workbench.service;
 import com.foxmo.crm.workbench.domain.Activity;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,4 +30,6 @@ public interface ActivityService {
     Activity queryActivityForDetailById(String id);
     //根据clueId查询所有与线索相关联的市场活动信息
     List<Activity> queryActivityForDetailByClueId(String clueId);
+    //根据activityName模糊查询市场活动信息，并排除已经关联clueId的市场活动
+    List<Activity> queryActivityForDetailByNameClueId(HashMap<String,Object> map);
 }

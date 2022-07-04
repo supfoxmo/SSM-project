@@ -237,8 +237,8 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				dataType:'json',
 				success:function (data) {
 					//把市场活动的信息显示在修改的模态窗口上
-					$("#edit-id").val(data.id);
 					$("#edit-fullname").val(data.fullname);
+					$("#edit-appellation").val(data.appellation);
 					$("#edit-owner").val(data.owner);
 					$("#edit-company").val(data.company);
 					$("#edit-job").val(data.job);
@@ -258,11 +258,15 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			});
 		})
 
-		//给"更新"按钮添加单击事件,修改选中线索信息
+		//给"更新"按钮添加单击事件,修改选中线的索信息
 		$("#editClueForDetailBtn").click(function () {
+			//获取列表中被选中的checkbox
+			var chkedIds=$("#tBody input[type='checkbox']:checked");
+			//获取指定修改的线索信息Id
+			var id=chkedIds[0].value;
 			//获取修改后的线索参数
-			var id = $("#edit-id").val();
 			var fullname = $("#edit-fullname").val();
+			var appellation = $("#edit-appellation").val();
 			var owner = $("#edit-owner").val();
 			var company = $("#edit-company").val();
 			var job = $("#edit-job").val();
@@ -276,13 +280,14 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			var contactSummary = $("#edit-contactSummary").val();
 			var nextContactTime = $("#edit-nextContactTime").val();
 			var address = $("#edit-address").val();
-			
+
 			//发送请求
 			$.ajax({
 				url : 'workbench/clue/editClueForDetailById.do',
 				data : {
 					id : id,
 					fullname : fullname,
+					appellation : appellation,
 					owner : owner,
 					company : company,
 					job : job,
@@ -561,7 +566,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 					<form class="form-horizontal" role="form">
 					
 						<div class="form-group">
-							<label for="edit-clueOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
+							<label for="edit-owner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="edit-owner">
                                     <c:forEach items="${userList}" var="u">
@@ -576,7 +581,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						</div>
 						
 						<div class="form-group">
-							<label for="edit-call" class="col-sm-2 control-label">称呼</label>
+							<label for="edit-appellation" class="col-sm-2 control-label">称呼</label>
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="edit-appellation">
 								  <option></option>
@@ -585,7 +590,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
                                     </c:forEach>
 								</select>
 							</div>
-							<label for="edit-surname" class="col-sm-2 control-label">姓名<span style="font-size: 15px; color: red;">*</span></label>
+							<label for="edit-fullname" class="col-sm-2 control-label">姓名<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
 								<input type="text" class="form-control" id="edit-fullname">
 							</div>
@@ -618,7 +623,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 							<div class="col-sm-10" style="width: 300px;">
 								<input type="text" class="form-control" id="edit-mphone">
 							</div>
-							<label for="edit-status" class="col-sm-2 control-label">线索状态</label>
+							<label for="edit-state" class="col-sm-2 control-label">线索状态</label>
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="edit-state">
 								  <option></option>
@@ -642,7 +647,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						</div>
 						
 						<div class="form-group">
-							<label for="edit-describe" class="col-sm-2 control-label">描述</label>
+							<label for="edit-description" class="col-sm-2 control-label">描述</label>
 							<div class="col-sm-10" style="width: 81%;">
 								<textarea class="form-control" rows="3" id="edit-description"></textarea>
 							</div>
@@ -680,7 +685,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal" id="editClueForDetailBtn">更新</button>
+					<button type="button" class="btn btn-primary" id="editClueForDetailBtn">更新</button>
 				</div>
 			</div>
 		</div>

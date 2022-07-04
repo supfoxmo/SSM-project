@@ -7,6 +7,7 @@ import com.foxmo.crm.workbench.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,6 +69,11 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public List<Activity> queryActivityForDetailByClueId(String clueId) {
         return activityMapper.selectActivityForDetailByClueId(clueId);
+    }
+
+    @Override
+    public List<Activity> queryActivityForDetailByNameClueId(HashMap<String, Object> map) {
+        return activityMapper.selectActivityForDetailByNameClueId(map);
     }
 
 
