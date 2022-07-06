@@ -173,4 +173,11 @@
     left join tbl_user u2 on cr.edit_by = u2.id
     where cr.clue_id = #{clueId}
   </select>
+
+  <insert id="insertCreateClueRemark" parameterType="com.foxmo.crm.workbench.domain.ClueRemark">
+    insert into tbl_clue_remark
+    (id,note_content,create_by,create_time,edit_flag,clue_id)
+    values
+    (#{id},#{noteContent},#{createBy},#{createTime},#{editFlag},#{clueId})
+  </insert>
 </mapper>

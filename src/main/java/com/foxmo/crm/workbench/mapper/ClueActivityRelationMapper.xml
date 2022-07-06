@@ -109,7 +109,7 @@
     where id = #{id,jdbcType=CHAR}
   </update>
 
-  <insert id="insertCreateClueActivityRelationByList" parameterType="com.foxmo.crm.workbench.domain.ClueActivityRelation" parameterMap="int">
+  <insert id="insertCreateClueActivityRelationByList" parameterType="com.foxmo.crm.workbench.domain.ClueActivityRelation">
     insert into tbl_clue_activity_relation 
         (id,clue_id,activity_id)
     values
@@ -117,4 +117,10 @@
           (#{clueActivityRelation.id},#{clueActivityRelation.clueId},#{clueActivityRelation.activityId})
         </foreach>
   </insert>
+
+  <delete id="deleteClueActivityRelationByClueAndActivityIds" parameterType="map">
+    delete from tbl_clue_activity_relation
+    where clue_id = #{clueId} and activity_id = #{activityId};
+  </delete>
+
 </mapper>

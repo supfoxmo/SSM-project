@@ -179,6 +179,54 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			//发送同步请求
 			window.location.href="workbench/clue/toConvert.do?id="+id;
 		});
+		
+		//给线索备注“保存”按钮添加单击事件
+		$("#saveClueRemarkBtn").click(function () {
+			//收集参数
+			var remark = $("#remark").val();
+			var clueId='${clue.id}';
+			//表单验证
+			//如果文本框为空，则无法发送请求
+			if (remark == ""){
+				alert("请输入线索备注信息！！！");
+				return;
+			}
+			$.ajax({
+				url : 'workbench/clue/saveClueRemark.do',
+				data : {
+					remark : remark,
+					clueId : clueId
+				},
+				type : 'post',
+				dataType : 'json',
+				success : function (data) {
+					if (data.code == "1"){
+						//保存成功，更新线索备注列表
+						var htmlstr = "";
+						$.each(data.retData,function (index,obj) {
+							htmlstr += "<div class=\"remarkDiv\" id=\"div_"+obj.id+"\" style=\"height: 60px;\">";
+							htmlstr += "	<img title=\""+obj.createBy+"\" src=\"image/user-thumbnail.png\" style=\"width: 30px; height:30px;\">";
+							htmlstr += "	<div style=\"position: relative; top: -40px; left: 40px;\" >";
+							htmlstr += "	<h5>"+obj.noteContent+"</h5>";
+							htmlstr += "		<font color=\"gray\">线索</font> <font color=\"gray\">-</font> <b>${clue.fullname}${clue.appellation}-${clue.company}</b> <small style=\"color: gray;\"> "+obj.editFlag=='0'?obj.createTime:obj.editTime+"由"+obj.editFlag=='0'?obj.createBy:obj.editBy+""+obj.editFlag=='0'?'创建':'修改'+"</small>";
+							htmlstr += "		<div style=\"position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;\">";
+							htmlstr += "			<a class=\"myHref\" name=\"editA\" remarkId=\""+obj.id+"\" href=\"javascript:void(0);\"><span class=\"glyphicon glyphicon-edit\" style=\"font-size: 20px; color: #E6E6E6;\"></span></a>";
+							htmlstr += "			&nbsp;&nbsp;&nbsp;&nbsp;";
+							htmlstr += "			<a class=\"myHref\" name=\"deleteA\" remarkId=\""+obj.id+"\" href=\"javascript:void(0);\"><span class=\"glyphicon glyphicon-remove\" style=\"font-size: 20px; color: #E6E6E6;\></span></a>";
+							htmlstr += "		</div>";
+							htmlstr += "	</div>";
+							htmlstr += "</div>";
+						})
+						$("#clueRemarkDiv").html(htmlstr);
+					}else{
+						//提示信息
+						alert(data.message);
+					}
+				}
+
+			})
+		})
+		
 	});
 	
 </script>
@@ -355,20 +403,22 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			<h4>备注</h4>
 		</div>
 
-		<c:forEach items="${remarkList}" var="remark">
-			<div class="remarkDiv" id="div_${remark.id}" style="height: 60px;">
-				<img title="${remark.createBy}" src="image/user-thumbnail.png" style="width: 30px; height:30px;">
-				<div style="position: relative; top: -40px; left: 40px;" >
-					<h5>${remark.noteContent}</h5>
-					<font color="gray">线索</font> <font color="gray">-</font> <b>${clue.fullname}${clue.appellation}-${clue.company}</b> <small style="color: gray;"> ${remark.editFlag=='0'?remark.createTime:remark.editTime} 由${remark.editFlag=='0'?remark.createBy:remark.editBy}${remark.editFlag=='0'?'创建':'修改'}</small>
-					<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">
-						<a class="myHref" name="editA" remarkId="${remark.id}" href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #E6E6E6;"></span></a>
-						&nbsp;&nbsp;&nbsp;&nbsp;
-						<a class="myHref" name="deleteA" remarkId="${remark.id}" href="javascript:void(0);"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span></a>
+		<div id="clueRemarkDiv">
+			<c:forEach items="${remarkList}" var="remark">
+				<div class="remarkDiv" id="div_${remark.id}" style="height: 60px;">
+					<img title="${remark.createBy}" src="image/user-thumbnail.png" style="width: 30px; height:30px;">
+					<div style="position: relative; top: -40px; left: 40px;" >
+						<h5>${remark.noteContent}</h5>
+						<font color="gray">线索</font> <font color="gray">-</font> <b>${clue.fullname}${clue.appellation}-${clue.company}</b> <small style="color: gray;"> ${remark.editFlag=='0'?remark.createTime:remark.editTime} 由${remark.editFlag=='0'?remark.createBy:remark.editBy}${remark.editFlag=='0'?'创建':'修改'}</small>
+						<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">
+							<a class="myHref" name="editA" remarkId="${remark.id}" href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #E6E6E6;"></span></a>
+							&nbsp;&nbsp;&nbsp;&nbsp;
+							<a class="myHref" name="deleteA" remarkId="${remark.id}" href="javascript:void(0);"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span></a>
+						</div>
 					</div>
 				</div>
-			</div>
-		</c:forEach>
+			</c:forEach>
+		<div>
 
 		<!-- 备注1 -->
 		<%--<div class="remarkDiv" style="height: 60px;">
@@ -403,7 +453,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				<textarea id="remark" class="form-control" style="width: 850px; resize : none;" rows="2"  placeholder="添加备注..."></textarea>
 				<p id="cancelAndSaveBtn" style="position: relative;left: 737px; top: 10px; display: none;">
 					<button id="cancelBtn" type="button" class="btn btn-default">取消</button>
-					<button type="button" class="btn btn-primary">保存</button>
+					<button type="button" class="btn btn-primary" id="saveClueRemarkBtn">保存</button>
 				</p>
 			</form>
 		</div>

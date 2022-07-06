@@ -10,8 +10,10 @@ import com.foxmo.crm.settings.service.DicValueService;
 import com.foxmo.crm.settings.service.UserService;
 import com.foxmo.crm.workbench.domain.Activity;
 import com.foxmo.crm.workbench.domain.Clue;
+import com.foxmo.crm.workbench.domain.ClueActivityRelation;
 import com.foxmo.crm.workbench.domain.ClueRemark;
 import com.foxmo.crm.workbench.service.ActivityService;
+import com.foxmo.crm.workbench.service.ClueActivityRelationService;
 import com.foxmo.crm.workbench.service.ClueRemarkService;
 import com.foxmo.crm.workbench.service.ClueService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class ClueController {
@@ -39,6 +38,8 @@ public class ClueController {
     public ClueRemarkService clueRemarkService;
     @Autowired
     public ActivityService activityService;
+    @Autowired
+    public ClueActivityRelationService clueActivityRelationService;
 
     @RequestMapping("/workbench/clue/index.do")
     public String clueIndex(HttpServletRequest request){
@@ -209,6 +210,120 @@ public class ClueController {
         List<Activity> activityList = activityService.queryActivityForDetailByNameClueId(map);
         //返回响应对象
         return activityList;
+    }
+
+    @ResponseBody
+    @RequestMapping("/workbench/clue/saveBund.do")
+    public Object saveBund(String[] activityId,String clueId){
+        //创建容器
+        List<ClueActivityRelation> clueActivityRelationList = new ArrayList<>();
+        //封装数据
+        ClueActivityRelation clueActivityRelation = null;
+        for (int i = 0;i < activityId.length;i++){
+            clueActivityRelation = new ClueActivityRelation();
+            clueActivityRelation.setId(UUIDUtils.getUUID());
+            clueActivityRelation.setClueId(clueId);
+            clueActivityRelation.setActivityId(activityId[i]);
+            clueActivityRelationList.add(i,clueActivityRelation);
+        }
+        //创建响应封装对象
+        ReturnObject returnObject = new ReturnObject();
+        List<Activity> activityList = null;
+        try{
+            //调用service层的方法，新建线索市场活动关系
+            int sum = clueActivityRelationService.saveCreateClueActivityRelationByList(clueActivityRelationList);
+            //判断批量新建线索市场活动关系是否成功
+            if (sum > 0){
+                //新建成功,调用service层的方法查询线索与市场活动新建的关联关系
+                activityList = activityService.queryActivityForDetailByRelationClueID(activityId);
+                //封装响应对象
+                returnObject.setCode(Constant.RETURN_OBJECT_CODE_SUCCESS);
+                returnObject.setMessage("线索市场活动关联成功！！！");
+                returnObject.setRetData(activityList);
+            }else{
+                //新建失败
+                returnObject.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
+                returnObject.setMessage("当前系统繁忙，请稍后重试。。。");
+            }
+        }catch (Exception e){
+            //新建失败
+            returnObject.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
+            returnObject.setMessage("当前系统繁忙，请稍后重试。。。");
+            e.printStackTrace();
+        }
+        return returnObject;
+    }
+
+    @ResponseBody
+    @RequestMapping("/workbench/clue/saveUnbund.do")
+    public Object saveUnbund(String activityId,String clueId){
+        //封装数据
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("activityId",activityId);
+        map.put("clueId",clueId);
+        //创建响应封装对象
+        ReturnObject returnObject = new ReturnObject();
+        try{
+            //调用service层的方法，删除指定的线索与市场活动关联关系
+            int count = clueActivityRelationService.removeClueActivityRelationByClueAndActivityIds(map);
+            //判断是否删除成功
+            if (count > 0){
+                //删除成功
+                returnObject.setCode(Constant.RETURN_OBJECT_CODE_SUCCESS);
+                returnObject.setMessage("关联关系删除成功！！！");
+            }else{
+                //删除失败
+                returnObject.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
+                returnObject.setMessage("当前系统繁忙，请稍后重试。。。");
+            }
+        }catch (Exception e){
+            //删除失败
+            returnObject.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
+            returnObject.setMessage("当前系统繁忙，请稍后重试。。。");
+            e.printStackTrace();
+        }
+        return returnObject;
+    }
+
+    @ResponseBody
+    @RequestMapping("/workbench/clue/saveClueRemark.do")
+    public Object saveClueRemark(String remark,String clueId,HttpSession session){
+        //获取当前用户
+        User user = (User)session.getAttribute(Constant.SESSION_USER);
+        //进一步封装参数
+        ClueRemark clueRemark = new ClueRemark();
+        clueRemark.setId(UUIDUtils.getUUID());
+        clueRemark.setNoteContent(remark);
+        clueRemark.setCreateBy(user.getId());
+        clueRemark.setCreateTime(DateUtils.formatDateTima(new Date()));
+        clueRemark.setEditFlag(Constant.REMARK_EDIT_FLAG_NO_EDITED);
+        clueRemark.setClueId(clueId);
+        //创建响应封装对象
+        ReturnObject returnObject = new ReturnObject();
+        try{
+            //调用service层的方法，保存线索备注信息
+            int count = clueRemarkService.saveCreateClueRemark(clueRemark);
+            //判断保存线索备注信息是否成功
+            if(count > 0){
+                //保存成功
+                returnObject.setCode(Constant.RETURN_OBJECT_CODE_SUCCESS);
+                returnObject.setMessage("保存成功！！！");
+                //调用service层的方法，根据clueId查询指定的线索备注信息
+                List<ClueRemark> clueRemarkList = clueRemarkService.queryClueRemarkForDetailByClueId(clueId);
+                //将查询到的线索备注信息存储到响应封装对象中
+                returnObject.setRetData(clueRemarkList);
+            }else{
+                //保存失败
+                returnObject.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
+                returnObject.setMessage("当前系统繁忙，请稍后重试。。。");
+            }
+        }catch (Exception e){
+            //保存失败
+            returnObject.setCode(Constant.RETURN_OBJECT_CODE_FAIL);
+            returnObject.setMessage("当前系统繁忙，请稍后重试。。。");
+            e.printStackTrace();
+        }
+        return returnObject;
     }
 
 }

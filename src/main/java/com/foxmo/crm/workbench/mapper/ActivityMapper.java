@@ -128,4 +128,11 @@ public interface ActivityMapper {
      * @return
      */
     List<Activity> selectActivityForDetailByNameClueId(HashMap<String,Object> map);
+
+    /**
+     * 根据clueId查询与之关联的所有市场活动的详细信息
+     * @param clueId
+     * @return
+     */
+    List<Activity> selectActivityForDetailByRelationClueId(String[] activityId);
 }

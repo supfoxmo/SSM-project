@@ -11,4 +11,11 @@ public interface ClueRemarkService {
      * @return
      */
     List<ClueRemark> queryClueRemarkForDetailByClueId(String clueId);
+
+    /**
+     * 保存新建线索备注信息
+     * @param clueRemark
+     * @return
+     */
+    int saveCreateClueRemark(ClueRemark clueRemark);
 }

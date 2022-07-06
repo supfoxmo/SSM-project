@@ -330,4 +330,14 @@
         where clue_id = #{clueId}
     )
   </select>
+
+  <select id="selectActivityForDetailByRelationClueId" parameterType="string" resultMap="BaseResultMap">
+    select a.id,a.name,a.start_date,a.end_date,u.name as owner
+    from tbl_activity a
+    join tbl_user u on a.owner = u.id
+    where a.id in
+    <foreach collection="array" item="activityId" open="(" close=")" separator=",">
+      #{activityId}
+    </foreach>
+  </select>
 </mapper>

@@ -59,4 +59,11 @@ public interface ClueRemarkMapper {
      * @return
      */
     List<ClueRemark> selectClueRemarkForDetailByClueId(String clueId);
+
+    /**
+     * 保存新建的线索备注信息
+     * @param clueRemark
+     * @return
+     */
+    int insertCreateClueRemark(ClueRemark clueRemark);
 }

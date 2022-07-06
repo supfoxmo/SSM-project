@@ -3,6 +3,7 @@ package com.foxmo.crm.workbench.mapper;
 import com.foxmo.crm.workbench.domain.ClueActivityRelation;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ClueActivityRelationMapper {
     /**
@@ -59,4 +60,11 @@ public interface ClueActivityRelationMapper {
      * @return
      */
     int insertCreateClueActivityRelationByList(List<ClueActivityRelation> ClueActivityRelationList);
+
+    /**
+     * 根据ClueId和ActivityId删除指定的线索与市场活动关联关系
+     * @param map
+     * @return
+     */
+    int deleteClueActivityRelationByClueAndActivityIds(Map<String,Object> map);
 }
