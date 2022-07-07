@@ -34,4 +34,6 @@ public interface ActivityService {
     List<Activity> queryActivityForDetailByNameClueId(HashMap<String,Object> map);
     //根据clueId查询与之关联的所有市场活动的详细信息
     List<Activity> queryActivityForDetailByRelationClueID(String[] activityId);
+    //根据Name和ClueId模糊查询指定线索已关联的市场活动信息
+    List<Activity> queryAvtivityForConvertByNameClueId(Map<String,Object> map);
 }

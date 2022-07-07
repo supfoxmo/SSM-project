@@ -340,4 +340,15 @@
       #{activityId}
     </foreach>
   </select>
+
+  <select id="seleAvtivityForConvertByNameClueId" parameterType="map" resultMap="BaseResultMap">
+    select a.id,a.name,a.start_date,a.end_date,u.name as owner
+    from tbl_activity a
+    join tbl_user u on a.owner = u.id
+    where a.name like '%' #{activityName} '%' and a.id in (
+        select car.activity_id
+        from tbl_clue_activity_relation car
+        where clue_id = #{clueId}
+    )
+  </select>
 </mapper>

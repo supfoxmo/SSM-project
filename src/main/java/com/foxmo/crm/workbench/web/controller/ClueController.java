@@ -326,4 +326,30 @@ public class ClueController {
         return returnObject;
     }
 
+    @RequestMapping("/workbench/clue/toConvert.do")
+    public String toConvert(String clueId,HttpSession session){
+        //调用service层的方法查询指定线索的详细信息
+        Clue clue = clueService.queryClueForDetailById(clueId);
+        //调用service层的方法查询状态信息
+        List<DicValue> stageList = dicValueService.queryDicValueByTypeCode("stage");
+        //将查询结果保存到session域中
+        session.setAttribute("clue",clue);
+        session.setAttribute("stageList",stageList);
+        //跳转到转换页面
+        return "workbench/clue/convert";
+    }
+
+    @ResponseBody
+    @RequestMapping("/workbench/clue/queryActivityForConvertByNameClueId.do")
+    public Object queryActivityForConvertByNameClueId(String activityName,String clueId){
+        //封装参数
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("activityName",activityName);
+        map.put("clueId",clueId);
+        //调用service层的方法查询
+        List<Activity> activityList = activityService.queryAvtivityForConvertByNameClueId(map);
+
+        //返回响应对象
+        return activityList;
+    }
 }

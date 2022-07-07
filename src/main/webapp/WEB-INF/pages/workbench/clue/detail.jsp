@@ -175,9 +175,9 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		//给"转换"按钮添加单击事件
 		$("#convertClueBtn").click(function () {
 			//收集参数
-			var id='${clue.id}';
+			var clueId='${clue.id}';
 			//发送同步请求
-			window.location.href="workbench/clue/toConvert.do?id="+id;
+			window.location.href="workbench/clue/toConvert.do?clueId="+clueId;
 		});
 		
 		//给线索备注“保存”按钮添加单击事件
